@@ -1,0 +1,144 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
+@import "weather-icons.min.css";
+@import "weather-icons-wind.min.css";
+
+body {
+    background: linear-gradient(90deg, #7474BF 10%, #348AC7 90%);
+}
+
+#weather_wrapper {
+    width: 400px;
+    margin: 5px auto;
+}
+
+.weatherCard {
+    width: 400px;
+    height: 200px;
+    font-family: 'Open Sans', serif;
+    position: relative;
+}
+
+.next > .weatherCard  {
+    height: 100px;
+}
+
+.currentTemp {
+    width: 220px;
+    height: 200px;
+    background: rgb(41, 41, 41);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.next > .weatherCard > .currentTemp {
+    height: 100px;
+}
+
+.currentWeather {
+    width: 180px;
+    height: 200px;
+    background: rgb(237, 237, 237);
+    margin: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.next > .weatherCard > .currentWeather  {
+    height: 100px;
+}
+
+.temp {
+    font-size: 80px;
+    text-align: center;
+    display: block;
+    font-weight: 300;
+    color: rgb(255, 255, 255);
+    padding: 0;
+}
+
+.next > .weatherCard > .currentTemp > .temp {
+    font-size: 30px;
+}
+
+.temp .feels_like {
+    font-size: 50px;
+}
+
+.next > .weatherCard > .currentTemp > .temp .feels_like {
+    font-size: 20px;
+}
+
+.header {
+    font-size: 15px;
+    text-align: center;
+    display: block;
+    color: rgb(255, 255, 255);
+    padding: 5px 0 0;
+}
+
+.location {
+    color: rgb(255, 255, 255);
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 1.5em;
+    display: block;
+}
+
+.conditions {
+    font-family: weathericons, serif;
+    font-size: 80px;
+    display: block;
+    padding: 40px 0 0;
+    text-align: center;
+}
+
+.info {
+    width: 180px;
+    height: 50px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: rgb(42, 178, 234);
+    font-weight: 700;
+    color: rgb(255, 255, 255);
+    text-align: center;
+}
+
+.rain {
+    width: 50%;
+    position: absolute;
+    left: 10px;
+    word-spacing: 60px;
+    top: 3px;
+}
+
+.rain::before {
+    display: block;
+    content: '\f04e';
+    font-family: weathericons, serif;
+    font-size: 40px;
+    left: 6px;
+    top: -4px;
+    position: absolute;
+}
+
+.wind {
+    width: 50%;
+    right: -10px;
+    position: absolute;
+    word-spacing: 60px;
+    top: 3px;
+}
+
+.wind::before {
+    display: block;
+    content: '\f050';
+    font-family: weathericons, serif;
+    font-size: 25px;
+    left: -10px;
+    position: absolute;
+    top: 5px;
+}
