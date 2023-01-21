@@ -10,7 +10,7 @@ from _camera import CameraData
 from _faces import FaceMethods
 from weather import WeatherMethods
 from _motion import MotionData
-from _speech import VoiceData, AudioRecorder
+from speech import VoiceData, AudioRecorder
 from _user import UserMethods
 
 app = Flask(__name__, static_url_path='/static')
