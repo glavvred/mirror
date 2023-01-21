@@ -16,7 +16,8 @@ SILENCE_LIMIT = 2  # Silence limit in seconds. The max amount of seconds where
 # recording finishes and the file is delivered.
 
 FILE_ALLOWED = ['image/png', 'image/jpeg']
-STORAGE = path.join(getcwd(), 'upload')
+IMAGE_STORAGE = path.join(getcwd(), 'upload')
+AUDIO_STORAGE = path.join(getcwd(), 'recordings')
 WEATHER_UPDATE_INTERVAL = 30  # minutes
 YANDEX_API_KEY = '8c9073a2-a106-4136-9cf8-54396aaf625f'
 CAMERA_ID = 0
@@ -26,3 +27,4 @@ DATABASE_PATH = f'{ROOT_DIR}\\dbase\\test_db.db'
 
 TIME_ZONE = pytz.timezone('Europe/Moscow')
 SQLALCHEMY_SILENCE_UBER_WARNING = 1
+INTENTS = 'models/intents.json'
