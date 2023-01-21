@@ -87,9 +87,8 @@ class WeatherMethods:
 
         logging.debug('weather grabbing done')
 
-    def get_current_weather(self):
+    @staticmethod
+    def get_current_weather():
         weather = get_last_weather()
         pprint(weather)
 
-
-WeatherMethods().get_current_weather()

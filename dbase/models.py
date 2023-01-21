@@ -96,7 +96,8 @@ class WeatherWithForecastParts(Weather):
                                   secondary=ForecastPart.__tablename__,
                                   lazy='joined',
                                   primaryjoin=Weather.id == WeatherForecastPart.weather_id,
-                                  secondaryjoin=ForecastPart.id == WeatherForecastPart.forecast_part_id)
+                                  secondaryjoin=ForecastPart.id == WeatherForecastPart.forecast_part_id
+                                  )
 
 
 class User(BaseModel):
@@ -110,10 +111,5 @@ class Face(BaseModel):
     __tablename__ = "face"
 
     filename = Column(String(100), nullable=False)
-
-
-class UserFaces(BaseModel):
-    __tablename__ = "user_faces"
-
     user_id = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), nullable=False, index=True)
-    face_id = Column(Integer, ForeignKey(Face.id, ondelete='CASCADE'), nullable=False, index=True)
+    user = relationship(User, backref="faces")

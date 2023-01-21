@@ -1,26 +1,27 @@
 import datetime
-import sqlite3
 from os import path
 from flask import request
 
-from sqlalchemy import select
 from werkzeug.utils import secure_filename
 
-from db import User
+from dbase.connection import DbConnect
+from dbase.models import User, Face
 import settings
 from toolbox import *
 
+session = DbConnect.get_session()
+logging = ToolBox.get_logger('weather')
+
 
 class UserData:
-    def __init__(self, app):
-        self.app = app
-        self.logging = app.logging
-        self.connection = sqlite3.connect(settings.sqlite3_path)
+    def __init__(self):
+        pass
 
-    def delete_user_by_id(self, user_id):
-        with self.connection as connection:
-            connection.execute("DELETE FROM user where id = ?", str(user_id))
-            connection.execute("DELETE FROM face where user_id = ?", str(user_id))
+    def delete_user_by_id(self, user_id: int):
+        user = session.query(User).filter(User.id == user_id).first()
+        print(user)
+        # User.query.filter(User.id == user_id).delete()
+        # Face.query.filter(Face == user_id).delete()
         return True
 
     def get_user_by_id(self, user_id):
@@ -70,8 +71,10 @@ class UserData:
                                                                                     datetime.datetime.now()))
             connection.execute("insert into face (filename, dt, user_id) VALUES (?, ?,?)", (filename,
 
-
                                                                                             datetime.datetime.now(),
                                                                                             request.form['name']))
 
         return ApiResponseHandle('all good')
+
+
+UserData().delete_user_by_id(1)

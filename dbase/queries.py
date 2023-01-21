@@ -10,5 +10,3 @@ def get_last_weather():
 
     return weather
 
-
-print(get_last_weather())
