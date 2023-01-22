@@ -7,10 +7,10 @@ from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-REVISION = 'd4074909d97d'
-DOWN_REVISION = None
-BRANCH_LABELS = None
-DEPENDS_ON = None
+revision = 'd4074909d97d'  # pylint: disable=C0103
+down_revision = None  # pylint: disable=C0103
+branch_labels = None  # pylint: disable=C0103
+depends_on = None  # pylint: disable=C0103
 
 
 def upgrade() -> None:

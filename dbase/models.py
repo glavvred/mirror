@@ -2,7 +2,9 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, Time, TIMESTAMP, func
 from sqlalchemy.orm import declarative_base, relationship
 
-from connection import DbConnect
+# pylint: disable=import-error
+from dbase.connection import DbConnect
+# pylint: enable=import-error
 
 Base = declarative_base()
 session = DbConnect.get_session()
