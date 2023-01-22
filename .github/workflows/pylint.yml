@@ -16,7 +16,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install software
       run: |
-        sudo apt-get install portaudio19-dev python-pyaudio python3-pyaudio
+        sudo apt install portaudio19-dev python3-pyaudio
     # this Action should follow steps to set up Python build environment
     - name: Install Python dependencies
       uses: py-actions/py-dependency-install@v4
