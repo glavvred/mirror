@@ -6,7 +6,6 @@ import requests
 
 from dbase.connection import DbConnect
 from dbase.models import Weather, ForecastPart
-from dbase.queries import get_last_weather
 from settings import TIME_ZONE, WEATHER_UPDATE_INTERVAL, YANDEX_API_KEY
 
 from toolbox import ToolBox
@@ -29,7 +28,7 @@ class WeatherMethods:
 
     def __init__(self):
         logger.debug('weather daemon initialised')
-        last_weather = get_last_weather()
+        last_weather = Weather().get_last_weather()
         if last_weather:
             self.last_grab = last_weather.created_at
         if not self.last_grab:

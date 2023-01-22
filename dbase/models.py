@@ -1,7 +1,11 @@
+""" database models """
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, Time, TIMESTAMP, func
 from sqlalchemy.orm import declarative_base, relationship
 
+from connection import DbConnect
+
 Base = declarative_base()
+session = DbConnect.get_session()
 
 
 class BaseModel(Base):
@@ -61,8 +65,20 @@ class Weather(BaseModel):
     condition = Column(String, ForeignKey(Condition.text), nullable=False)
     forecast_parts = relationship("ForecastPart", cascade="all, delete-orphan", backref="weather")
 
+    def get_last(self):
+        """
+        get last weather
+        :return:
+        """
+        weather = session.query(Weather).order_by(Weather.id.desc()).first()
+
+        return weather
+
 
 class ForecastPart(BaseModel):
+    """
+    forecast
+    """
     __tablename__ = "forecast_part"
 
     part_name = Column(String, nullable=False)
@@ -90,6 +106,9 @@ class ForecastPart(BaseModel):
 
 
 class User(BaseModel):
+    """
+    user
+    """
     __tablename__ = "user"
 
     name = Column(String(100), nullable=False)
@@ -97,6 +116,9 @@ class User(BaseModel):
 
 
 class Face(BaseModel):
+    """
+    face of user
+    """
     __tablename__ = "face"
 
     filename = Column(String(100), nullable=False)
