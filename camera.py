@@ -1,3 +1,4 @@
+""" Module camera recorder """
 import time
 import cv2
 import settings
@@ -13,6 +14,8 @@ class CameraData:
     Camera capture daemon
     """
     stopped = False
+    grabbed = None
+    frame = None
 
     def __init__(self):
         logger.debug('camera grab daemon initialised')
@@ -53,7 +56,7 @@ class CameraData:
                 return
             (self.grabbed, self.frame) = self.stream.read()
             if self.grabbed:
-                ret, jpeg = cv2.imencode('.jpg', self.frame)
+                _, jpeg = cv2.imencode('.jpg', self.frame)
                 settings.last_frame = jpeg.tobytes()
 
     def stop(self):

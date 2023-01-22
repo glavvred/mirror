@@ -1,3 +1,4 @@
+""" Module audiorecorder """
 import audioop
 import contextlib
 import math
@@ -40,9 +41,8 @@ class AudioRecorder:
         # Prepend audio from 0.5 seconds before noise was detected
         prev_audio = deque(maxlen=int(settings.PREV_AUDIO * rel))
         started = False
-        n = num_phrases
-
-        while num_phrases == -1 or n > 0:
+        current_num = 0
+        while num_phrases == -1 or current_num > 0:
             threshold = settings.THRESHOLD
             cur_data = stream.read(settings.CHUNK)
             slid_win.append(math.sqrt(abs(audioop.avg(cur_data, 4))))
@@ -59,7 +59,7 @@ class AudioRecorder:
                 slid_win = deque(maxlen=int(settings.SILENCE_LIMIT * rel))
                 prev_audio = deque(maxlen=int(0.5 * rel))
                 audio2send = []
-                n -= 1
+                current_num -= 1
                 print("Listening ...")
             else:
                 prev_audio.append(cur_data)
@@ -69,13 +69,13 @@ class AudioRecorder:
         Playback for testing
         :return:
         """
-        with wave.open(settings.AUDIO_FILENAME, 'rb') as wf:
-            stream = self.p.open(format=self.p.get_format_from_width(wf.getsampwidth()),
-                                 channels=wf.getnchannels(),
-                                 rate=wf.getframerate(),
+        with wave.open(settings.AUDIO_FILENAME, 'rb') as wave_file:
+            stream = self.p.open(format=self.p.get_format_from_width(wave_file.getsampwidth()),
+                                 channels=wave_file.getnchannels(),
+                                 rate=wave_file.getframerate(),
                                  output=True)
 
-            while len(data := wf.readframes(settings.CHUNK)):
+            while len(data := wave_file.readframes(settings.CHUNK)):
                 stream.write(data)
 
             stream.close()
