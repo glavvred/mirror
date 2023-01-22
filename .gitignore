@@ -20,7 +20,5 @@ docs/_build/
 /upload
 /logs
 /main.log
-/models
 /recordings
-/models/
 /dbase/test_db.db
