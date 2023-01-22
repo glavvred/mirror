@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from os import path
 # https://github.com/ageitgey/face_recognition
 import face_recognition
@@ -23,7 +25,13 @@ class FaceData:
         # init load
         self.load_known()
 
-    def get_user_by_key(self, user_index=0):
+    """
+        Get user from known users array
+        :param user_index: user_id
+        :type int
+        :return: int|None    
+    """
+    def get_user_by_key(self, user_index: int = 0) -> int | None:
         if user_index in self.face_user_keys:
             return self.face_user_keys[user_index]
         return None

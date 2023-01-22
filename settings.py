@@ -14,10 +14,12 @@ THRESHOLD = 1000  # The threshold intensity that defines silence
 SILENCE_LIMIT = 2  # Silence limit in seconds. The max amount of seconds where
 # only silence is recorded. When this time passes the
 # recording finishes and the file is delivered.
+PREV_AUDIO = 0.5  #
 
 FILE_ALLOWED = ['image/png', 'image/jpeg']
 IMAGE_STORAGE = path.join(getcwd(), 'upload')
 AUDIO_STORAGE = path.join(getcwd(), 'recordings')
+AUDIO_FILENAME = 'record.wav'
 WEATHER_UPDATE_INTERVAL = 30  # minutes
 YANDEX_API_KEY = '8c9073a2-a106-4136-9cf8-54396aaf625f'
 CAMERA_ID = 1

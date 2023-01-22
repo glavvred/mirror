@@ -1,18 +1,17 @@
-import datetime
 import faulthandler
 import threading
 
-from flask import Flask, Response, render_template
-import settings
+from flask import Flask, render_template
+from audio import AudioRecorder
 from path import check_and_create_directories
 from toolbox import *
 
 from camera import CameraData
 from faces import FaceData
+from users import UserData
 from weather import WeatherMethods
 from motion import MotionData
 from speech import VoiceData
-from user import UserData
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -37,14 +36,14 @@ def weather():
 
 if __name__ == '__main__':
     faulthandler.enable()
-    app.logging = ToolBox().get_logger("main", logging.DEBUG)
+    logger = ToolBox().get_logger("main", logging.DEBUG)
 
     thread = threading.Thread(name='weather_daemon', target=WeatherMethods().start)
     thread.setDaemon(True)
     thread.start()
 
     camera_status = CameraData().test_camera()
-    app.logging.debug('Checking camera: %s ', camera_status)
+    logger.debug('Checking camera: %s ', camera_status)
     if camera_status == 'Available':
         c_d = threading.Thread(name='camera_daemon', target=CameraData().start)
         c_d.setDaemon(True)
@@ -58,13 +57,13 @@ if __name__ == '__main__':
 
     check_and_create_directories()
 
-    # audio_recorded = threading.Event()
-    # ar_d = threading.Thread(name='audio_recording_daemon', target=AudioRecorder(audio_recorded).start)
-    # ar_d.setDaemon(True)
-    # ar_d.start()
-    # vr_d = threading.Thread(name='voice_recognition_daemon', target=VoiceData(audio_recorded).start)
-    # vr_d.setDaemon(True)
-    # vr_d.start()
+    audio_recorded = threading.Event()
+    ar_d = threading.Thread(name='audio_recording_daemon', target=AudioRecorder(audio_recorded).start)
+    ar_d.setDaemon(True)
+    ar_d.start()
+    vr_d = threading.Thread(name='voice_recognition_daemon', target=VoiceData(audio_recorded).start)
+    vr_d.setDaemon(True)
+    vr_d.start()
 
     while True:
         pass
