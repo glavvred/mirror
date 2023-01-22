@@ -1,16 +1,14 @@
-from numpy import array
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.svm import LinearSVC
-from vosk import Model, KaldiRecognizer
-import speech_recognition as sr
-import wave
 import json
 import os
-import settings
-import pyttsx3
+import wave
 
+import pyttsx3
+import speech_recognition as sr
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.svm import LinearSVC
+from vosk import Model, KaldiRecognizer
+
+import settings
 from toolbox import ToolBox
 
 logging = ToolBox.get_logger('speech')

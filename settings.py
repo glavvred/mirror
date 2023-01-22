@@ -1,11 +1,11 @@
 import os
 from os import path, getcwd
-import pyaudio
+
 import pytz
 
 # Microphone stream config.
 CHUNK = 1024  # CHUNKS of bytes to read each time from mic
-FORMAT = pyaudio.paInt16
+FORMAT = 8
 CHANNELS = 1
 RATE = 16000
 THRESHOLD = 1000  # The threshold intensity that defines silence

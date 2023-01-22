@@ -1,13 +1,13 @@
 import datetime
 from os import path
+
 from flask import request
 from sqlalchemy import select
-
 from werkzeug.utils import secure_filename
 
+import settings
 from dbase.connection import DbConnect
 from dbase.models import User, Face
-import settings
 from toolbox import *
 
 session = DbConnect.get_session()

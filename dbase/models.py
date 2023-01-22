@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Boolean, Time, TIMESTAMP, func
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, Time, TIMESTAMP, func
 from sqlalchemy.orm import declarative_base, relationship
 
 from dbase.connection import DbConnect
@@ -7,19 +7,27 @@ Base = declarative_base()
 
 
 class BaseModel(Base):
+    """
+    Base model for all classes
+    """
     __abstract__ = True
 
     query = DbConnect.get_scoped_session().query_property()
 
     id = Column(Integer, nullable=False, unique=True, primary_key=True, autoincrement=True)
-    created_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.current_timestamp())
-    updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.current_timestamp())
+    created_at = Column(TIMESTAMP, nullable=False, server_default=func.now(),
+                        onupdate=func.current_timestamp())
+    updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(),
+                        onupdate=func.current_timestamp())
 
     def __repr__(self):
         return "<{0.__class__.__name__}(id={0.id!r})>".format(self)
 
 
 class Condition(BaseModel):
+    """
+    weather conditions
+    """
     __tablename__ = "condition"
 
     text = Column(String(22), unique=True, nullable=False)
@@ -28,6 +36,9 @@ class Condition(BaseModel):
 
 
 class Weather(BaseModel):
+    """
+    weather itself
+    """
     __tablename__ = 'weather'
 
     lat = Column(Float, nullable=False)
@@ -51,16 +62,8 @@ class Weather(BaseModel):
     week = Column(Integer, nullable=False)
     moon = Column(Integer, nullable=False)
 
-
-class WeatherConditions(BaseModel):
-    __tablename__ = 'weather_conditions'
-    weather_id = Column(ForeignKey(Weather.id, ondelete='CASCADE'), nullable=False, index=True)
-    condition_id = Column(ForeignKey(Condition.id, ondelete='CASCADE'), nullable=False, index=True)
-
-
-class WeatherWithConditions(Weather):
-    weather_condition = relationship(Weather, secondary=WeatherConditions.__tablename__, lazy='joined',
-                                     remote_side=Weather.id)
+    condition = relationship(Condition)
+    forecast_parts = relationship("ForecastPart", cascade="all, delete-orphan", backref="weather")
 
 
 class ForecastPart(BaseModel):
@@ -88,20 +91,22 @@ class ForecastPart(BaseModel):
     condition = Column(String, ForeignKey(Condition.text), nullable=False)
 
 
-class WeatherForecastPart(BaseModel):
-    __tablename__ = "weather_forecast_parts"
-
-    weather_id = Column(Integer, ForeignKey(Weather.id, ondelete='CASCADE'), nullable=False, index=True)
-    forecast_part_id = Column(Integer, ForeignKey(ForecastPart.id, ondelete='CASCADE'), nullable=False, index=True)
-
-
-class WeatherWithForecastParts(Weather):
-    forecast_parts = relationship(WeatherForecastPart,
-                                  secondary=ForecastPart.__tablename__,
-                                  lazy='joined',
-                                  primaryjoin=Weather.id == WeatherForecastPart.weather_id,
-                                  secondaryjoin=ForecastPart.id == WeatherForecastPart.forecast_part_id
-                                  )
+# class WeatherForecastPart(BaseModel):
+#     __tablename__ = "weather_forecast_parts"
+#
+#     weather_id = Column(Integer, ForeignKey(Weather.id, ondelete='CASCADE'), nullable=False,
+#                         index=True)
+#     forecast_part_id = Column(Integer, ForeignKey(ForecastPart.id, ondelete='CASCADE'),
+#                               nullable=False, index=True)
+#
+#
+# class WeatherWithForecastParts(Weather):
+#     forecast_parts = relationship(WeatherForecastPart,
+#                                   secondary=ForecastPart.__tablename__,
+#                                   lazy='joined',
+#                                   primaryjoin=Weather.id == WeatherForecastPart.weather_id,
+#                                   secondaryjoin=ForecastPart.id == WeatherForecastPart.forecast_part_id
+#                                   )
 
 
 class User(BaseModel):

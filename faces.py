@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import string
 from os import path
+
 # https://github.com/ageitgey/face_recognition
 import face_recognition
 from sqlalchemy import select

@@ -1,13 +1,12 @@
 import datetime
 import time
-from pprint import pprint
 
 import requests
 
-from settings import *
 from dbase.connection import DbConnect
-from dbase.models import Weather, ForecastPart, WeatherForecastPart
+from dbase.models import Weather, ForecastPart
 from dbase.queries import get_last_weather
+from settings import *
 from toolbox import ToolBox
 
 session = DbConnect.get_session()
@@ -65,23 +64,22 @@ class WeatherMethods:
             temperature=fact['temp'], feels_like=fact['feels_like'], wind_gust=fact['wind_gust'],
             wind_speed=fact['wind_speed'], wind_dir=fact['wind_dir'], pressure=fact['pressure_mm'],
             humidity=fact['humidity'], is_day_time=True if (fact['daytime'] == 'd') else False,
-            season=seasonToInt[fact['season']][0], sunrise=datetime.time.fromisoformat(forecast['sunrise']),
-            sunset=datetime.time.fromisoformat(forecast['sunset']), week=forecast['week'], moon=forecast['moon_code']
+            season=seasonToInt[fact['season']][0],
+            sunrise=datetime.time.fromisoformat(forecast['sunrise']),
+            sunset=datetime.time.fromisoformat(forecast['sunset']), week=forecast['week'],
+            moon=forecast['moon_code']
         )
         session.add(weather_data)
-        session.commit()
 
         for fp in weather_datum['forecast']['parts']:
-            part = ForecastPart(part_name=fp['part_name'], condition=fp['condition'], temp_avg=fp['temp_avg'],
-                                temp_max=fp['temp_max'], temp_min=fp['temp_min'], feels_like=fp['feels_like'],
-                                wind_speed=fp['wind_speed'], wind_gust=fp['wind_gust'], wind_dir=fp['wind_dir'],
-                                pressure=fp['pressure_mm'], humidity=fp['humidity'], prec_mm=fp['prec_mm'],
+            part = ForecastPart(part_name=fp['part_name'], condition=fp['condition'],
+                                temp_avg=fp['temp_avg'], temp_max=fp['temp_max'],
+                                temp_min=fp['temp_min'], feels_like=fp['feels_like'],
+                                wind_speed=fp['wind_speed'], wind_gust=fp['wind_gust'],
+                                wind_dir=fp['wind_dir'], pressure=fp['pressure_mm'],
+                                humidity=fp['humidity'], prec_mm=fp['prec_mm'],
                                 prec_period=fp['prec_period'], prec_prob=fp['prec_prob'])
-            session.add(part)
-            session.commit()
-
-            session.add(WeatherForecastPart(weather_id=weather_data.id, forecast_part_id=part.id))
-            session.commit()
+            weather_data.forecast_parts.append(part)
 
         session.commit()
 
@@ -90,4 +88,3 @@ class WeatherMethods:
     @staticmethod
     def get_current_weather():
         return get_last_weather()
-

@@ -1,5 +1,6 @@
 """ Database connection and init """
 import sqlite3
+
 from sqlalchemy import create_engine, orm
 from sqlalchemy.orm import sessionmaker, scoped_session
 

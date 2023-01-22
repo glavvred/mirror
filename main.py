@@ -2,16 +2,16 @@ import faulthandler
 import threading
 
 from flask import Flask, render_template
-from audio import AudioRecorder
-from path import check_and_create_directories
-from toolbox import *
 
+from audio import AudioRecorder
 from camera import CameraData
 from faces import FaceData
+from motion import MotionData
+from path import check_and_create_directories
+from speech import VoiceData
+from toolbox import *
 from users import UserData
 from weather import WeatherMethods
-from motion import MotionData
-from speech import VoiceData
 
 app = Flask(__name__, static_url_path='/static')
 

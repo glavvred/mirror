@@ -1,6 +1,7 @@
 import cv2
 import imutils as imutils
 import numpy as np
+
 import settings
 from dbase.connection import DbConnect
 from toolbox import ToolBox

@@ -1,6 +1,8 @@
 """ Module camera recorder """
 import time
+
 import cv2
+
 import settings
 from dbase.connection import DbConnect
 from toolbox import ToolBox
