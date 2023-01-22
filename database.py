@@ -3,7 +3,7 @@ from os import path, getcwd
 
 from sqlalchemy import create_engine, orm
 
-sqlite3_path = path.join(getcwd(), f'database\\test_db.db')
+sqlite3_path = path.join(getcwd(), f'dbase\\test_db.db')
 
 
 def get_connection():

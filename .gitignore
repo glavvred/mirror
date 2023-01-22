@@ -21,4 +21,4 @@ docs/_build/
 /logs
 /main.log
 /recordings
-/dbase/test_db.db
+/dbase/*.db
