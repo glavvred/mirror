@@ -11,12 +11,15 @@ import settings
 
 
 class AudioRecorder:
+    """
+    Listen to microphone,
+    record cuts if any,
+    write files
+    """
     p = pyaudio.PyAudio()
 
     def __init__(self, audio_recorded_event: Event = None):
         self.audio_recorded = audio_recorded_event
-        self.file = open(settings.AUDIO_FILENAME, "wb+")
-        self.energy_threshold = settings.THRESHOLD
         self.stream = self.p.open(format=settings.FORMAT,
                                   channels=settings.CHANNELS,
                                   rate=settings.RATE,
@@ -24,6 +27,11 @@ class AudioRecorder:
                                   frames_per_buffer=settings.CHUNK)
 
     def start(self, num_phrases=-1):
+        """
+        Capture given number of phrases or till silence comes
+        :param num_phrases:
+        :return: None
+        """
         stream = self.stream
         print("* Listening mic. ")
         audio2send = []
@@ -35,18 +43,17 @@ class AudioRecorder:
         n = num_phrases
 
         while num_phrases == -1 or n > 0:
-            threshold = self.energy_threshold
+            threshold = settings.THRESHOLD
             cur_data = stream.read(settings.CHUNK)
             slid_win.append(math.sqrt(abs(audioop.avg(cur_data, 4))))
-            if sum([x > threshold for x in slid_win]) > 0:
+            if sum([x > threshold for x in slid_win]) > 0:  # silence is broken
                 if not started:
                     started = True
                 audio2send.append(cur_data)
             elif started is True:
-
-                self.save_speech(list(prev_audio) + audio2send)
-                self.play_audio()
-                self.audio_recorded.set()
+                self.save_file(list(prev_audio) + audio2send)
+                # self.play_audio() # testing
+                self.audio_recorded.set()  # flag for audio recognition daemon
                 # Reset all
                 started = False
                 slid_win = deque(maxlen=int(settings.SILENCE_LIMIT * rel))
@@ -58,6 +65,10 @@ class AudioRecorder:
                 prev_audio.append(cur_data)
 
     def play_audio(self):
+        """
+        Playback for testing
+        :return:
+        """
         with wave.open(settings.AUDIO_FILENAME, 'rb') as wf:
             stream = self.p.open(format=self.p.get_format_from_width(wf.getsampwidth()),
                                  channels=wf.getnchannels(),
@@ -70,7 +81,12 @@ class AudioRecorder:
             stream.close()
             self.p.terminate()
 
-    def save_speech(self, data):
+    def save_file(self, data):
+        """
+        Write down captured audio part
+        :param data:
+        :return:
+        """
         with contextlib.closing(wave.open(settings.AUDIO_FILENAME, 'wb')) as wf:
             wf.setnchannels(1)
             wf.setsampwidth(self.p.get_sample_size(pyaudio.paInt16))
@@ -79,7 +95,11 @@ class AudioRecorder:
             wf.close()
 
     def __del__(self):
+        """
+        clear your tracks
+        :return:
+        """
         print("* Done recording")
-        os.remove("microphone-results.wav")
+        os.remove(settings.AUDIO_FILENAME)
         self.stream.close()
         self.p.terminate()

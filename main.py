@@ -42,7 +42,7 @@ if __name__ == '__main__':
     thread.setDaemon(True)
     thread.start()
 
-    camera_status = CameraData().test_camera()
+    camera_status = CameraData().is_camera_available()
     logger.debug('Checking camera: %s ', camera_status)
     if camera_status == 'Available':
         c_d = threading.Thread(name='camera_daemon', target=CameraData().start)
