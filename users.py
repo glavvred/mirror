@@ -1,3 +1,4 @@
+""" user module """
 import datetime
 from os import path
 
@@ -8,18 +9,23 @@ from werkzeug.utils import secure_filename
 import settings
 from dbase.connection import DbConnect
 from dbase.models import User, Face
-from toolbox import *
+from toolbox import ToolBox, ApiResponseHandle
 
 session = DbConnect.get_session()
 logging = ToolBox.get_logger('weather')
 
 
-class UserData:
+class UserMethods:
+    """ user functions """
+
     def __init__(self):
         pass
 
     @staticmethod
     def delete_user_by_id(user_id: int):
+        """
+        delete one
+        """
         user = session.execute(select(User).filter(User.id == user_id)).first()
         if not user:
             return False
@@ -28,7 +34,10 @@ class UserData:
         session.commit()
         return True
 
-    def get_user(self, user_id):
+    def get_user(self, user_id) -> ApiResponseHandle:
+        """
+        api get/delete
+        """
         user = session.execute(select(User).filter(User.id == user_id)).first()[0]
         if not user:
             return ApiResponseHandle('found none', 404)
@@ -39,9 +48,13 @@ class UserData:
         if request.method == 'DELETE':
             self.delete_user_by_id(user.id)
             return ApiResponseHandle('deleted', 200)
+        return ApiResponseHandle('found none', 404)
 
     @staticmethod
     def new_user():
+        """
+        api new user
+        """
         if 'image' not in request.files:
             output = {"success": False, "reason": "Image field requested"}
             return ApiResponseHandle(output, 200)
@@ -51,7 +64,8 @@ class UserData:
             output = {"success": False, "reason": "Image mimetype is not in list"}
             return ApiResponseHandle(output, 500)
 
-        filename = "_".join([datetime.datetime.now().strftime("%y%m%d_%H%M%S"), secure_filename(file.filename)])
+        filename = "_".join(
+            [datetime.datetime.now().strftime("%y%m%d_%H%M%S"), secure_filename(file.filename)])
         file.save(path.join(settings.IMAGE_STORAGE, 'trained', filename))
 
         new_user = User(request.form['name'])

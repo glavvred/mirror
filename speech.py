@@ -1,5 +1,7 @@
+""" speech recognition module """
 import json
 import os
+import sys
 import wave
 
 import pyttsx3
@@ -11,27 +13,46 @@ from vosk import Model, KaldiRecognizer
 import settings
 from toolbox import ToolBox
 
-logging = ToolBox.get_logger('speech')
+logger = ToolBox.get_logger('speech')
 
 
 class Menu:
+    """
+    functions list
+    """
+
     def get_ready(self):
-        pass
+        """
+        get ready to next command
+        """
 
     def wake(self):
-        pass
+        """
+        rise and shine
+        """
 
     def dismiss(self):
-        pass
+        """
+        bye
+        """
 
     def play_failure_phrase(self):
-        pass
+        """
+        not found
+        """
 
     def not_found(self):
+        """
+        not found
+        """
         print('not found')
 
 
 class VoiceAssistant:
+    """
+    voice assistant class
+    """
+
     def __init__(self):
         # настройка данных голосового помощника
         self.name = "Mirror"
@@ -39,7 +60,7 @@ class VoiceAssistant:
         self.speech_language = "ru"
 
         self.assistant = None
-        self.ttsEngine = pyttsx3.init()
+        self.tts_engine = pyttsx3.init()
 
         # self.assistant = VoiceAssistant()
         # self.assistant.name = "Mirror"
@@ -49,21 +70,32 @@ class VoiceAssistant:
         # self.ttsEngine.setProperty("voice", voices[0].id)
 
     def play_voice_assistant_speech(self, text):
-        self.ttsEngine.say(str(text))
-        self.ttsEngine.runAndWait()
+        """
+        play voice
+        """
+        self.tts_engine.say(str(text))
+        self.tts_engine.runAndWait()
 
 
 class VoiceData:
+    """
+    speech recognition
+    """
+
     def __init__(self, audio_recorded_event=None):
-        self.intents = json.load(open(settings.INTENTS, 'r', encoding='utf-8'))
+        self.intents = settings.INTENTS
         self.audio_recorded = audio_recorded_event
         self.recognizer = sr.Recognizer()
         self.microphone = sr.Microphone()
 
-    def record_and_recognize_audio(self):
+    def recognize_and_remove_audio(self):
+        """
+        recognize and remove
+        """
+
         recognized_data = ""
         try:
-            logging.debug("Started recognition...")
+            logger.debug("Started recognition...")
             with sr.AudioFile(settings.AUDIO_STORAGE) as source:
                 audio = self.recognizer.record(source)
                 recognized_data = self.recognizer.recognize_google(audio, language="ru").lower()
@@ -72,54 +104,67 @@ class VoiceData:
             pass
 
         except sr.RequestError:
-            logging.debug("Trying to use offline recognition...")
+            logger.debug("Trying to use offline recognition...")
             recognized_data = self.use_offline_recognition()
 
         os.remove(settings.AUDIO_STORAGE)
 
         return recognized_data
 
-    def use_offline_recognition(self):
+    @staticmethod
+    def use_offline_recognition():
+        """
+        vosk recognizer
+        """
+
         recognized_data = ""
         # проверка наличия модели на нужном языке в каталоге приложения
         if not os.path.exists("models/vosk-model-small-ru-0.4"):
-            logging.debug("Please download the model from:\n"
-                          "https://alphacephei.com/vosk/models and unpack as 'model' in the current folder.")
-            exit(1)
-        try:
-            # анализ записанного в микрофон аудио (чтобы избежать повторов фразы)
-            wave_audio_file = wave.open("microphone-results.wav", "rb")
-            model = Model("models/vosk-model-small-ru-0.4")
-            offline_recognizer = KaldiRecognizer(model, wave_audio_file.getframerate())
+            logger.debug("Please download the model from:\n"
+                         "https://alphacephei.com/vosk/models and unpack as 'model'"
+                         " in the current folder.")
+            sys.exit(1)
+        # try:
 
-            data = wave_audio_file.readframes(wave_audio_file.getnframes())
-            if len(data) > 0:
-                if offline_recognizer.AcceptWaveform(data):
-                    recognized_data = offline_recognizer.Result()
-                    recognized_data = json.loads(recognized_data)
-                    recognized_data = recognized_data["text"]
-        except:
-            logging.debug("Sorry, speech service is unavailable. Try again later")
+        # анализ записанного в микрофон аудио (чтобы избежать повторов фразы)
+        wave_audio_file = wave.open(settings.AUDIO_STORAGE, "rb")
+        model = Model("models/vosk-model-small-ru-0.4")
+        offline_recognizer = KaldiRecognizer(model, wave_audio_file.getframerate())
+
+        data = wave_audio_file.readframes(wave_audio_file.getnframes())
+        if len(data) > 0:
+            if offline_recognizer.AcceptWaveform(data):
+                recognized_data = offline_recognizer.Result()
+                recognized_data = json.loads(recognized_data)
+                recognized_data = recognized_data["text"]
+        # except:
+        #     logger.debug("Sorry, speech service is unavailable. Try again later")
 
         return recognized_data
 
-    def execute_command_with_name(self, command_name: str, *args: list):
+    def execute_command_by_name(self, command_name: str, *args: list):
+        """
+        execute
+        """
         command_name = str.lower(command_name)
-        for key in self.intents['intents'].keys():
-            if command_name in key:
-                getattr(Menu(), self.intents['intents'][key]['callable'])(*args)
-        Menu().not_found()
+        with json.load(open(self.intents, 'r', encoding='utf-8')) as intents:
+            for key in intents['intents'].keys():
+                if command_name in key:
+                    getattr(Menu(), intents['intents'][key]['callable'])(*args)
+            Menu().not_found()
 
     def prepare_corpus(self):
-        # Подготовка модели
+        """
+        model preparation
+        """
         corpus = []
         target_vector = []
 
-        intents = json.load(open(self.intents, 'r', encoding='utf-8'))
-        for intent_name, intent_data in intents['intents'].items():
-            for example in intent_data["examples"]:
-                corpus.append(example)
-                target_vector.append(intent_name)
+        with json.load(open(self.intents, 'r', encoding='utf-8')) as intents:
+            for intent_name, intent_data in intents['intents'].items():
+                for example in intent_data["examples"]:
+                    corpus.append(example)
+                    target_vector.append(intent_name)
 
         vectorizer = TfidfVectorizer()
         training_vector = vectorizer.fit_transform(corpus)
@@ -128,15 +173,20 @@ class VoiceData:
         model.fit(training_vector, target_vector)
 
     def start(self):
+        """
+        main loop for voice recognition
+        and command completion
+        :return:
+        """
         while True:
             if self.audio_recorded.is_set():
                 print('got it')
                 self.audio_recorded.clear()
-                voice_input = self.record_and_recognize_audio()
+                voice_input = self.recognize_and_remove_audio()
                 if voice_input:
                     print(voice_input)
                     voice_input = voice_input.split(" ")
                     command = voice_input[0]
-                    command_options = [str(input_part) for input_part in voice_input[1:len(voice_input)]]
-                    self.execute_command_with_name(command, command_options)
-
+                    command_options = [str(input_part) for input_part in
+                                       voice_input[1:len(voice_input)]]
+                    self.execute_command_by_name(command, command_options)

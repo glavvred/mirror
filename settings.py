@@ -1,3 +1,4 @@
+""" project settings """
 import os
 from os import path, getcwd
 

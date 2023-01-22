@@ -1,3 +1,4 @@
+""" weather handling """
 import datetime
 import time
 
@@ -11,7 +12,7 @@ from settings import TIME_ZONE, WEATHER_UPDATE_INTERVAL, YANDEX_API_KEY
 from toolbox import ToolBox
 
 session = DbConnect.get_session()
-logging = ToolBox.get_logger('weather')
+logger = ToolBox.get_logger('weather')
 seasonToInt = {
     'summer': (1, 'лето'),
     'autumn': (2, 'осень'),
@@ -21,10 +22,13 @@ seasonToInt = {
 
 
 class WeatherMethods:
+    """
+    weather class
+    """
     last_grab = None
 
     def __init__(self):
-        logging.debug('weather daemon initialised')
+        logger.debug('weather daemon initialised')
         last_weather = get_last_weather()
         if last_weather:
             self.last_grab = last_weather.created_at
@@ -34,7 +38,11 @@ class WeatherMethods:
             self.last_grab = last_id.created_at
 
     def start(self):
-        logging.debug('weather daemon started')
+        """
+        main loop
+        :return:
+        """
+        logger.debug('weather daemon started')
         while True:
             time_delta = datetime.datetime.now(tz=TIME_ZONE) - TIME_ZONE.fromutc(self.last_grab)
             if time_delta.seconds > WEATHER_UPDATE_INTERVAL * 60:
@@ -43,7 +51,11 @@ class WeatherMethods:
                 time.sleep(1)
 
     def weather_grab(self):
-        logging.debug('weather grabbing started')
+        """
+        grab and parse
+        :return:
+        """
+        logger.debug('weather grabbing started')
         self.last_grab = time.time()
         headers = {'Content-Type': 'application/json',
                    'X-Yandex-API-Key': YANDEX_API_KEY}
@@ -64,7 +76,7 @@ class WeatherMethods:
             lat=info['lat'], lon=info['lon'],
             temperature=fact['temp'], feels_like=fact['feels_like'], wind_gust=fact['wind_gust'],
             wind_speed=fact['wind_speed'], wind_dir=fact['wind_dir'], pressure=fact['pressure_mm'],
-            humidity=fact['humidity'], is_day_time=True if (fact['daytime'] == 'd') else False,
+            humidity=fact['humidity'], is_day_time=bool(fact['daytime'] == 'd'),
             season=seasonToInt[fact['season']][0],
             sunrise=datetime.time.fromisoformat(forecast['sunrise']),
             sunset=datetime.time.fromisoformat(forecast['sunset']), week=forecast['week'],
@@ -72,20 +84,24 @@ class WeatherMethods:
         )
         session.add(weather_data)
 
-        for fp in weather_datum['forecast']['parts']:
-            part = ForecastPart(part_name=fp['part_name'], condition=fp['condition'],
-                                temp_avg=fp['temp_avg'], temp_max=fp['temp_max'],
-                                temp_min=fp['temp_min'], feels_like=fp['feels_like'],
-                                wind_speed=fp['wind_speed'], wind_gust=fp['wind_gust'],
-                                wind_dir=fp['wind_dir'], pressure=fp['pressure_mm'],
-                                humidity=fp['humidity'], prec_mm=fp['prec_mm'],
-                                prec_period=fp['prec_period'], prec_prob=fp['prec_prob'])
+        for f_part in weather_datum['forecast']['parts']:
+            part = ForecastPart(part_name=f_part['part_name'], condition=f_part['condition'],
+                                temp_avg=f_part['temp_avg'], temp_max=f_part['temp_max'],
+                                temp_min=f_part['temp_min'], feels_like=f_part['feels_like'],
+                                wind_speed=f_part['wind_speed'], wind_gust=f_part['wind_gust'],
+                                wind_dir=f_part['wind_dir'], pressure=f_part['pressure_mm'],
+                                humidity=f_part['humidity'], prec_mm=f_part['prec_mm'],
+                                prec_period=f_part['prec_period'], prec_prob=f_part['prec_prob'])
             weather_data.forecast_parts.append(part)
 
         session.commit()
 
-        logging.debug('weather grabbing done')
+        logger.debug('weather grabbing done')
 
     @staticmethod
     def get_current_weather():
+        """
+        get weather
+        :return:
+        """
         return get_last_weather()

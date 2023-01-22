@@ -1,7 +1,12 @@
+""" make sure we have all folders we need """
 import os
 
 
-def check_and_create_directories():
+def create_folders_if_not_exist():
+    """
+    create if not exists
+    :return:
+    """
     # sound
     if not os.path.exists('models'):
         os.makedirs('models')

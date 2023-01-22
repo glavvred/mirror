@@ -47,7 +47,7 @@ class AudioRecorder:
             threshold = settings.THRESHOLD
             cur_data = stream.read(settings.CHUNK)
             slid_win.append(math.sqrt(abs(audioop.avg(cur_data, 4))))
-            if sum([x > threshold for x in slid_win]) > 0:  # silence is broken
+            if sum(x > threshold for x in slid_win) > 0:  # silence is broken
                 if not started:
                     started = True
                 audio2send.append(cur_data)
@@ -88,12 +88,12 @@ class AudioRecorder:
         :param data:
         :return:
         """
-        with contextlib.closing(wave.open(settings.AUDIO_FILENAME, 'wb')) as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(self.p.get_sample_size(pyaudio.paInt16))
-            wf.setframerate(16000)
-            wf.writeframes(b''.join(data))
-            wf.close()
+        with contextlib.closing(wave.open(settings.AUDIO_FILENAME, 'wb')) as wave_file:
+            wave_file.setnchannels(1)
+            wave_file.setsampwidth(self.p.get_sample_size(pyaudio.paInt16))
+            wave_file.setframerate(16000)
+            wave_file.writeframes(b''.join(data))
+            wave_file.close()
 
     def __del__(self):
         """
