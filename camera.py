@@ -2,21 +2,22 @@ import logging
 import time
 import cv2
 import settings
+from dbase.connection import DbConnect
+from toolbox import ToolBox
 
-last_frame = None
+session = DbConnect.get_session()
+logging = ToolBox.get_logger('camera')
 
 
 class CameraData:
-    def __init__(self, app):
-        self.app = app
-        self.logging = app.logging
-        self.logging.debug('camera grab daemon initialised')
+    stopped = False
+
+    def __init__(self):
+        logging.debug('camera grab daemon initialised')
         self.last_grab = time.time() - 1
         # DSHOW( and MSMF) are windows only.
         # on linux, use V4L, FFMPEG or GSTREAMER
-        self.stream = cv2.VideoCapture(app.config['camera_id'], cv2.CAP_DSHOW)
-        self.stopped = False
-        self.update_started = False
+        self.stream = cv2.VideoCapture(settings.CAMERA_ID, cv2.CAP_DSHOW)
 
     def test_camera(self):
         if self.stream is None or not self.stream.isOpened():
@@ -30,10 +31,10 @@ class CameraData:
             if time.time() - self.last_grab > 1:
                 self.read()
             else:
-                time.sleep(1)
+                time.sleep(settings.CAMERA_INTERVAL)
 
     def read(self):
-        self.logging.debug('camera grab image')
+        logging.debug('camera grab image')
         while True:
             if self.stopped:
                 return
@@ -43,7 +44,7 @@ class CameraData:
                 settings.last_frame = jpeg.tobytes()
 
     def stop(self):
-        self.logging.debug('camera grab daemon stopping')
+        logging.debug('camera grab daemon stopping')
         self.stopped = True
 
     def __del__(self):

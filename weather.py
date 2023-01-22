@@ -89,6 +89,5 @@ class WeatherMethods:
 
     @staticmethod
     def get_current_weather():
-        weather = get_last_weather()
-        pprint(weather)
+        return get_last_weather()
 

@@ -1,15 +1,19 @@
 import cv2
 import imutils as imutils
 import numpy as np
-
 import settings
+from dbase.connection import DbConnect
+from toolbox import ToolBox
+
+session = DbConnect.get_session()
+logging = ToolBox.get_logger('motion')
 
 
 class MotionData:
-    def __init__(self, app):
-        self.app = app
-        self.logging = app.logging
-        self.storage = app.config["storage"]
+    # глобальная переменная, тащится из camera.py
+    frame = settings.last_frame
+
+    def __init__(self):
         pass
 
     @staticmethod
@@ -19,12 +23,11 @@ class MotionData:
         return gray
 
     def detect_motion(self):
-        self.logging.debug('motion detection started')
+        logging.debug('motion detection started')
         previous_frame = None
         while True:
-            frame = settings.last_frame
-            if frame:
-                current_frame = self.grey_blur_image(cv2.imdecode(np.frombuffer(frame, np.uint8), -1))
+            if self.frame:
+                current_frame = self.grey_blur_image(cv2.imdecode(np.frombuffer(self.frame, np.uint8), -1))
                 settings.motion_detected = False
                 if previous_frame is None:
                     previous_frame = current_frame

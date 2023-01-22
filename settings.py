@@ -20,7 +20,10 @@ IMAGE_STORAGE = path.join(getcwd(), 'upload')
 AUDIO_STORAGE = path.join(getcwd(), 'recordings')
 WEATHER_UPDATE_INTERVAL = 30  # minutes
 YANDEX_API_KEY = '8c9073a2-a106-4136-9cf8-54396aaf625f'
-CAMERA_ID = 0
+CAMERA_ID = 1
+CAMERA_INTERVAL = 0.5
+last_frame = None
+motion_detected = None
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE_PATH = f'{ROOT_DIR}\\dbase\\test_db.db'

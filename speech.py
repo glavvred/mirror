@@ -13,7 +13,7 @@ import pyttsx3
 
 from toolbox import ToolBox
 
-logging = ToolBox.get_logger('weather')
+logging = ToolBox.get_logger('speech')
 
 
 class Menu:
