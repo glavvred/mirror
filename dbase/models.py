@@ -1,11 +1,15 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Boolean, Time, TIMESTAMP, func
 from sqlalchemy.orm import declarative_base, relationship
 
+from dbase.connection import DbConnect
+
 Base = declarative_base()
 
 
 class BaseModel(Base):
     __abstract__ = True
+
+    query = DbConnect.get_scoped_session().query_property()
 
     id = Column(Integer, nullable=False, unique=True, primary_key=True, autoincrement=True)
     created_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.current_timestamp())
@@ -104,7 +108,7 @@ class User(BaseModel):
     __tablename__ = "user"
 
     name = Column(String(100), nullable=False)
-    dt = Column(DateTime, nullable=False)
+    faces = relationship("Face", cascade="all, delete-orphan", backref="user")
 
 
 class Face(BaseModel):
@@ -112,4 +116,3 @@ class Face(BaseModel):
 
     filename = Column(String(100), nullable=False)
     user_id = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), nullable=False, index=True)
-    user = relationship(User, backref="faces")

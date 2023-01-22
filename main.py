@@ -11,7 +11,7 @@ from _faces import FaceMethods
 from weather import WeatherMethods
 from _motion import MotionData
 from speech import VoiceData, AudioRecorder
-from _user import UserMethods
+from user import UserMethods
 
 app = Flask(__name__, static_url_path='/static')
 settings.init(app)
