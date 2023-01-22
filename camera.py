@@ -59,7 +59,7 @@ class CameraData:
             (self.grabbed, self.frame) = self.stream.read()
             if self.grabbed:
                 _, jpeg = cv2.imencode('.jpg', self.frame)
-                settings.last_frame = jpeg.tobytes()
+                settings.LAST_FRAME = jpeg.tobytes()
 
     def stop(self):
         """

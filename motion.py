@@ -12,7 +12,7 @@ logging = ToolBox.get_logger('motion')
 
 class MotionData:
     # глобальная переменная, тащится из camera.py
-    frame = settings.last_frame
+    frame = settings.LAST_FRAME
 
     def __init__(self):
         pass
@@ -29,7 +29,7 @@ class MotionData:
         while True:
             if self.frame:
                 current_frame = self.grey_blur_image(cv2.imdecode(np.frombuffer(self.frame, np.uint8), -1))
-                settings.motion_detected = False
+                settings.MOTION_DETECTED = False
                 if previous_frame is None:
                     previous_frame = current_frame
 
@@ -40,4 +40,4 @@ class MotionData:
                 contours = imutils.grab_contours(contours)
                 for contour in contours:
                     if cv2.contourArea(contour) > 100000:
-                        settings.motion_detected = True
+                        settings.MOTION_DETECTED = True

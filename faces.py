@@ -64,8 +64,8 @@ class FaceData:
         """
         logging.debug('camera grab daemon started')
         while True:
-            if settings.motion_detected:
-                self.recognize(settings.last_frame)
+            if settings.MOTION_DETECTED:
+                self.recognize(settings.LAST_FRAME)
 
     def recognize(self, filename: string = ""):
         """

@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, Time, TIMESTAMP, func
 from sqlalchemy.orm import declarative_base, relationship
 
-from dbase.connection import DbConnect
-
 Base = declarative_base()
 
 
@@ -11,8 +9,6 @@ class BaseModel(Base):
     Base model for all classes
     """
     __abstract__ = True
-
-    query = DbConnect.get_scoped_session().query_property()
 
     id = Column(Integer, nullable=False, unique=True, primary_key=True, autoincrement=True)
     created_at = Column(TIMESTAMP, nullable=False, server_default=func.now(),
@@ -62,7 +58,7 @@ class Weather(BaseModel):
     week = Column(Integer, nullable=False)
     moon = Column(Integer, nullable=False)
 
-    condition = relationship(Condition)
+    condition = Column(String, ForeignKey(Condition.text), nullable=False)
     forecast_parts = relationship("ForecastPart", cascade="all, delete-orphan", backref="weather")
 
 
@@ -88,25 +84,9 @@ class ForecastPart(BaseModel):
     prec_period = Column(Integer, nullable=False)
     prec_prob = Column(Integer, nullable=False)
 
+    weather_id = Column(Integer, ForeignKey(Weather.id), nullable=False)
+    weather = relationship("Weather", backref="forecast_parts")
     condition = Column(String, ForeignKey(Condition.text), nullable=False)
-
-
-# class WeatherForecastPart(BaseModel):
-#     __tablename__ = "weather_forecast_parts"
-#
-#     weather_id = Column(Integer, ForeignKey(Weather.id, ondelete='CASCADE'), nullable=False,
-#                         index=True)
-#     forecast_part_id = Column(Integer, ForeignKey(ForecastPart.id, ondelete='CASCADE'),
-#                               nullable=False, index=True)
-#
-#
-# class WeatherWithForecastParts(Weather):
-#     forecast_parts = relationship(WeatherForecastPart,
-#                                   secondary=ForecastPart.__tablename__,
-#                                   lazy='joined',
-#                                   primaryjoin=Weather.id == WeatherForecastPart.weather_id,
-#                                   secondaryjoin=ForecastPart.id == WeatherForecastPart.forecast_part_id
-#                                   )
 
 
 class User(BaseModel):

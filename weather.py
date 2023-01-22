@@ -6,7 +6,8 @@ import requests
 from dbase.connection import DbConnect
 from dbase.models import Weather, ForecastPart
 from dbase.queries import get_last_weather
-from settings import *
+from settings import TIME_ZONE, WEATHER_UPDATE_INTERVAL, YANDEX_API_KEY
+
 from toolbox import ToolBox
 
 session = DbConnect.get_session()
