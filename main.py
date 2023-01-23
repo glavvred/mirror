@@ -15,6 +15,7 @@ from toolbox import ToolBox
 
 from users import UserMethods
 from weather import WeatherMethods
+from dbase.models import Weather
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -42,7 +43,7 @@ def weather():
     """
     show weather
     """
-    weather_data = WeatherMethods().get_current_weather()
+    weather_data = Weather.get_current()
     return render_template('weather.html', weather_data=weather_data)
 
 

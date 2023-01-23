@@ -1,7 +1,7 @@
 """ Module camera recorder """
 import time
 
-import cv2
+import cv2  # pylint: disable=E0401
 
 import settings
 from dbase.connection import DbConnect

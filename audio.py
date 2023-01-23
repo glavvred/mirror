@@ -7,7 +7,7 @@ import wave
 from collections import deque
 from threading import Event
 
-import pyaudio
+import pyaudio  # pylint: disable=E0401
 
 import settings
 
