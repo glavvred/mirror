@@ -28,6 +28,8 @@ CAMERA_INTERVAL = 0.5
 LAST_FRAME = None
 MOTION_DETECTED = None
 
+LOGGING_TO_STDOUT = True  # disable for production
+
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE_PATH = f'{ROOT_DIR}\\dbase\\test_db.db'
 

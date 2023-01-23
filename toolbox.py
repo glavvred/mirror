@@ -1,8 +1,11 @@
 """ usefull methods """
 import json
 import logging
+import sys
 
 from flask import Response
+
+import settings
 
 
 class ApiResponseHandle:
@@ -37,15 +40,19 @@ class ToolBox:
         :return:
         """
         logger = logging.getLogger(channel)
-        logging.basicConfig(filename='logs\\' + channel + '.log', filemode='w',
-                            format='%(name)s - %(levelname)s - %(message)s')
-
         logger.setLevel(level)
+        file_handler = logging.FileHandler(f'logs\\{channel}.log')
 
-        file_handler = logging.FileHandler("main.log")
         formatter = '%(asctime)s - %(threadName)s - %(levelname)s - %(message)s'
         formatter = logging.Formatter(formatter)
-        file_handler.setFormatter(formatter)
 
+        file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
+
+        if settings.LOGGING_TO_STDOUT:
+            handler = logging.StreamHandler(sys.stdout)
+            handler.setLevel(logging.DEBUG)
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+
         return logger

@@ -25,5 +25,5 @@ class DbConnect:
         Get session
         :return: orm.Session
         """
-        engine = create_engine('sqlite:///' + DATABASE_PATH)
+        engine = create_engine('sqlite:///' + DATABASE_PATH, echo=True)
         return orm.Session(bind=engine)
