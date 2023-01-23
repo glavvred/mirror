@@ -21,9 +21,10 @@ jobs:
     - name: Install Python dependencies
       uses: py-actions/py-dependency-install@v4
       with:
-        update-pip: "true"
+        update-pip: "false"
         update-setuptools: "false"
         update-wheel: "false"
+        path: "requirements_github.txt"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip

@@ -1,0 +1,14 @@
+alembic==1.9.2
+Flask==2.2.2
+imutils==0.5.4
+Jinja2==3.1.2
+Mako==1.2.4
+numpy==1.24.1
+pyttsx3==2.90
+requests==2.28.2
+SQLAlchemy==1.4.46
+vosk==0.3.45
+Werkzeug==2.2.2
+wheel==0.38.4
+future==0.18.3
+sklearn~=0.0.post1
