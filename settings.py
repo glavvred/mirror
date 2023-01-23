@@ -2,7 +2,7 @@
 import os
 from os import path, getcwd
 
-import pytz
+import pytz  # pylint: disable=E0401
 
 # Microphone stream config.
 CHUNK = 1024  # CHUNKS of bytes to read each time from mic

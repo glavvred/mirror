@@ -1,5 +1,5 @@
 """ motion detection and capture """
-import cv2
+import cv2  # pylint: disable=E0401
 import imutils
 import numpy as np
 

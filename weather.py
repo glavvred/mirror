@@ -1,5 +1,6 @@
 """ weather handling """
 import datetime
+import sys
 import time
 
 import requests
@@ -27,6 +28,7 @@ class WeatherMethods:
     last_grab = None
 
     def __init__(self):
+        self.stop = None  # stop flag for daemon
         logger.debug('weather daemon initialised')
         last_weather = Weather().get_last_weather()
         if last_weather:
@@ -43,6 +45,8 @@ class WeatherMethods:
         """
         logger.debug('weather daemon started')
         while True:
+            if self.stop:
+                sys.exit(1)
             time_delta = datetime.datetime.now(tz=TIME_ZONE) - TIME_ZONE.fromutc(self.last_grab)
             if time_delta.seconds > WEATHER_UPDATE_INTERVAL * 60:
                 self.weather_grab()
@@ -96,11 +100,3 @@ class WeatherMethods:
         session.commit()
 
         logger.debug('weather grabbing done')
-
-    @staticmethod
-    def get_current_weather():
-        """
-        get weather
-        :return:
-        """
-        return get_last_weather()

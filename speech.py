@@ -5,9 +5,9 @@ import sys
 import wave
 
 import pyttsx3
-import speech_recognition as sr
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import LinearSVC
+import speech_recognition as sr # pylint: disable=E0401
+from sklearn.feature_extraction.text import TfidfVectorizer # pylint: disable=E0401
+from sklearn.svm import LinearSVC # pylint: disable=E0401
 from vosk import Model, KaldiRecognizer
 
 import settings

@@ -5,7 +5,7 @@ import string
 from os import path
 
 # https://github.com/ageitgey/face_recognition
-import face_recognition
+import face_recognition  # pylint: disable=E0401
 from sqlalchemy import select
 
 import settings

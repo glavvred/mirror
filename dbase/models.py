@@ -67,7 +67,8 @@ class Weather(BaseModel):
     condition = Column(String, ForeignKey(Condition.text), nullable=False)
     forecast_parts = relationship("ForecastPart", cascade="all, delete-orphan", backref="weather")
 
-    def get_last(self):
+    @staticmethod
+    def get_last():
         """
         get last weather
         :return:
