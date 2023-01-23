@@ -2,6 +2,7 @@
 import sqlite3
 
 from sqlalchemy import create_engine, orm
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 from settings import DATABASE_PATH
 
@@ -25,5 +26,7 @@ class DbConnect:
         Get session
         :return: orm.Session
         """
+        session = scoped_session(sessionmaker())
         engine = create_engine('sqlite:///' + DATABASE_PATH, echo=True)
-        return orm.Session(bind=engine)
+        session.configure(bind=engine)
+        return session

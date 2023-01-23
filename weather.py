@@ -43,7 +43,6 @@ class WeatherMethods:
             if self.stop:
                 sys.exit(1)
             time_delta = datetime.datetime.now(tz=TIME_ZONE) - TIME_ZONE.fromutc(self.last_grab)
-            print(time_delta)
             if time_delta.seconds > WEATHER_UPDATE_INTERVAL * 60:
                 self.weather_grab()
                 time.sleep(5)
@@ -68,7 +67,7 @@ class WeatherMethods:
         weather_datum = requests.get('https://api.weather.yandex.ru/v2/informers/', params=payload,
                                      headers=headers).json()
 
-        if weather_datum['message'] != 'forbidden':
+        if 'now' in weather_datum:
             fact = weather_datum['fact']
             info = weather_datum['info']
             forecast = weather_datum['forecast']

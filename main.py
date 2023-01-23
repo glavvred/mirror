@@ -7,6 +7,7 @@ from flask import Flask, render_template
 
 from audio import AudioRecorder
 from camera import CameraData
+from connection import DbConnect
 from faces import FaceData
 from motion import MotionData
 from path import create_folders_if_not_exist
@@ -40,6 +41,7 @@ if CAMERA_STATUS:
     fr_d.setDaemon(True)
     fr_d.start()
 
+print('here1')
 create_folders_if_not_exist()
 
 audio_recorded = threading.Event()
@@ -47,9 +49,16 @@ ar_d = threading.Thread(name='audio_recording_daemon',
                         target=AudioRecorder(audio_recorded).start)
 ar_d.setDaemon(True)
 ar_d.start()
+print('here2')
 vr_d = threading.Thread(name='voice_recognition_daemon', target=VoiceData(audio_recorded).start)
 vr_d.setDaemon(True)
 vr_d.start()
+
+session = DbConnect.get_session()
+
+if __name__ == '__main__':
+    print('here4')
+    app.run(debug=True)
 
 
 # routes
@@ -75,9 +84,5 @@ def weather():
     """
     show weather
     """
-    weather_data = Weather().get_last()
+    weather_data = Weather.get_last()
     return render_template('weather.html', weather_data=weather_data)
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
