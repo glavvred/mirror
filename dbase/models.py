@@ -1,4 +1,6 @@
 """ database models """
+from typing import Any
+
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean, Time, TIMESTAMP, func
 from sqlalchemy.orm import declarative_base, relationship
 from dbase.connection import DbConnect  # pylint: disable=import-error

@@ -104,7 +104,8 @@ class WeatherMethods:
             session.commit()
 
             logger.debug('weather grabbing done')
-        logger.debug('wait for another day')
+        else:
+            logger.debug('wait for another day')
 
     def __del__(self):
         """

@@ -25,8 +25,8 @@ class MotionData:
     def grey_blur_image(frame):
         """
         make image blurred and grey
-        :param frame: image
-        :return: image
+        :param frame: image in
+        :return: image out
         """
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (21, 21), 0)
@@ -40,9 +40,9 @@ class MotionData:
         logger.debug('motion detection started')
         previous_frame = None
         while True:
-            if self.frame:
+            if settings.LAST_FRAME:
                 current_frame = self.grey_blur_image(
-                    cv2.imdecode(np.frombuffer(self.frame, np.uint8), -1))
+                    cv2.imdecode(np.frombuffer(settings.LAST_FRAME, np.uint8), -1))
                 settings.MOTION_DETECTED = False
                 if previous_frame is None:
                     previous_frame = current_frame

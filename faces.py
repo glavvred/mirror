@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import string
-from os import path
+from os import path, getcwd
 
 # https://github.com/ageitgey/face_recognition
 import face_recognition  # pylint: disable=E0401
@@ -50,7 +50,7 @@ class FaceData:
         for user_row in results:
             if user_row[0].faces:
                 face_image = face_recognition.load_image_file(
-                    path.join(settings.IMAGE_STORAGE, 'trained', user_row[0].faces[0].filename))
+                    path.join(settings.IMAGE_STORAGE_TRAINED, user_row[0].faces[0].filename))
                 # всегда считаем что на тренировочной фотке одно лицо
                 face_image_encoding = face_recognition.face_encodings(face_image)[0]
                 index_key = len(self.known_encoding_faces)
@@ -62,21 +62,22 @@ class FaceData:
         """
             main loop for face recognition daemon
         """
-        logging.debug('camera grab daemon started')
+        logging.debug('face recognition daemon started')
         while True:
             if settings.MOTION_DETECTED:
+                logging.debug(settings.MOTION_DETECTED)
                 self.recognize(settings.LAST_FRAME)
 
-    def recognize(self, filename: string = ""):
+    def recognize(self, captured_image: string = ""):
         """
         Find faces in captured image
         Compare them to known users
-        :param filename: captured image
+        :param captured_image: captured image
         """
         matched_users = []
-        unknown_face_image = face_recognition.load_image_file(
-            path.join(settings.IMAGE_STORAGE, 'unknown', filename))
-        unknown_face_image_encodings = face_recognition.face_encodings(unknown_face_image)
+
+        unknown_face_image_locations = face_recognition.face_locations(captured_image)
+        unknown_face_image_encodings = face_recognition.face_encodings(captured_image, unknown_face_image_locations)
         if len(unknown_face_image_encodings) > 0:
             for unknown_face_image_encoding in unknown_face_image_encodings:
                 results = face_recognition.compare_faces(

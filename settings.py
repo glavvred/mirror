@@ -18,12 +18,13 @@ SILENCE_LIMIT = 2  # Silence limit in seconds. The max amount of seconds where
 PREV_AUDIO = 0.5  #
 
 FILE_ALLOWED = ['image/png', 'image/jpeg']
-IMAGE_STORAGE = path.join(getcwd(), 'upload')
+IMAGE_STORAGE_TRAINED = path.join(getcwd(), 'upload\\trained')
+IMAGE_STORAGE_UNKNOWN = path.join(getcwd(), 'upload\\unknown')
 AUDIO_STORAGE = path.join(getcwd(), 'recordings')
 AUDIO_FILENAME = 'record.wav'
 WEATHER_UPDATE_INTERVAL = 30  # minutes
 YANDEX_API_KEY = '8c9073a2-a106-4136-9cf8-54396aaf625f'
-CAMERA_ID = 1
+CAMERA_ID_MAX = 10
 CAMERA_INTERVAL = 0.5
 LAST_FRAME = None
 MOTION_DETECTED = None

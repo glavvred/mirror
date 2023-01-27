@@ -18,48 +18,50 @@ class CameraData:
     stopped = False
     grabbed = None
     frame = None
+    camera_id = None
 
     def __init__(self):
-        logger.debug('camera grab daemon initialised')
         self.last_grab = time.time() - 1
         # DSHOW( and MSMF) are windows only.
         # on linux, use V4L, FFMPEG or GSTREAMER
-        self.stream = cv2.VideoCapture(settings.CAMERA_ID, cv2.CAP_DSHOW)
-
-    def is_camera_available(self) -> bool:
-        """
-        Test if camera is available
-        :return: bool
-        """
-        if self.stream is None or not self.stream.isOpened():
+        self.get_camera_id()
+        if not self.camera_id:
             self.stop()
-            return False
-        return True
+        # logger.debug(f'current camera id is {self.camera_id}')
+        self.stream = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+        logger.debug('camera grab daemon initialised')
+
+    def get_camera_id(self):
+        """
+        check if any camera present at 0-10 slots
+        """
+        for camera_id in range(0, settings.CAMERA_ID_MAX):
+            stream = cv2.VideoCapture(camera_id, cv2.CAP_DSHOW)
+            if stream.isOpened():
+                self.camera_id = camera_id
+                return
 
     def start(self):
         """
         Main loop for image capturing daemon
-        :return: None
+        Loop for camera image grab
+        :return:  jpeg to global variable settings.last_frame
         """
         logger.debug('camera grab daemon started')
         while True:
-            if time.time() - self.last_grab > 1:
-                self.read()
-            else:
-                time.sleep(settings.CAMERA_INTERVAL)
-
-    def read(self):
-        """
-        Loop for camera image grab
-        :return: jpeg to global variable settings.last_frame
-        """
-        while True:
             if self.stopped:
                 return
-            (self.grabbed, self.frame) = self.stream.read()
-            if self.grabbed:
-                _, jpeg = cv2.imencode('.jpg', self.frame)
-                settings.LAST_FRAME = jpeg.tobytes()
+            if time.time() - self.last_grab > 1:
+                (self.grabbed, self.frame) = self.stream.read()
+                if self.grabbed:
+                    _, jpeg = cv2.imencode('.jpg', self.frame)
+                    small_frame = cv2.resize(self.frame, (0, 0), fx=0.25, fy=0.25)
+                    # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
+                    rgb_small_frame = small_frame[:, :, ::-1]
+                    settings.LAST_FRAME = rgb_small_frame.tobytes()
+                self.last_grab = time.time()
+            else:
+                time.sleep(settings.CAMERA_INTERVAL)
 
     def stop(self):
         """
@@ -68,6 +70,8 @@ class CameraData:
         """
         logger.debug('camera grab daemon stopping')
         self.stopped = True
+        self.stream.release()
+        cv2.destroyAllWindows()
 
     def __del__(self):
         """
