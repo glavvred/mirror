@@ -54,11 +54,10 @@ class CameraData:
             if time.time() - self.last_grab > 1:
                 (self.grabbed, self.frame) = self.stream.read()
                 if self.grabbed:
-                    _, jpeg = cv2.imencode('.jpg', self.frame)
                     small_frame = cv2.resize(self.frame, (0, 0), fx=0.25, fy=0.25)
                     # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
                     rgb_small_frame = small_frame[:, :, ::-1]
-                    settings.LAST_FRAME = rgb_small_frame.tobytes()
+                    settings.LAST_FRAME = rgb_small_frame
                 self.last_grab = time.time()
             else:
                 time.sleep(settings.CAMERA_INTERVAL)

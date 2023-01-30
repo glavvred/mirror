@@ -1,4 +1,6 @@
 """ motion detection and capture """
+import time
+
 import cv2  # pylint: disable=E0401
 import imutils
 import numpy as np
@@ -40,9 +42,8 @@ class MotionData:
         logger.debug('motion detection started')
         previous_frame = None
         while True:
-            if settings.LAST_FRAME:
-                current_frame = self.grey_blur_image(
-                    cv2.imdecode(np.frombuffer(settings.LAST_FRAME, np.uint8), -1))
+            if np.any(settings.LAST_FRAME):
+                current_frame = self.grey_blur_image(settings.LAST_FRAME)
                 settings.MOTION_DETECTED = False
                 if previous_frame is None:
                     previous_frame = current_frame
@@ -54,5 +55,5 @@ class MotionData:
                                             cv2.CHAIN_APPROX_SIMPLE)
                 contours = imutils.grab_contours(contours)
                 for contour in contours:
-                    if cv2.contourArea(contour) > 100000:
+                    if cv2.contourArea(contour) > 10000:
                         settings.MOTION_DETECTED = True

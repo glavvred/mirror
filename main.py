@@ -32,26 +32,26 @@ if session.query(Condition).count() == 0:  # пустая таблица conditi
 # thread.start()
 
 
-c_d = threading.Thread(name='camera_daemon', target=CameraData().start)
-c_d.setDaemon(True)
-c_d.start()
-m_d = threading.Thread(name='motion_daemon', target=MotionData().detect_motion)
-m_d.setDaemon(True)
-m_d.start()
-fr_d = threading.Thread(name='face_recognition_daemon', target=FaceData().start)
-fr_d.setDaemon(True)
-fr_d.start()
+# c_d = threading.Thread(name='camera_daemon', target=CameraData().start)
+# c_d.setDaemon(True)
+# c_d.start()
+# m_d = threading.Thread(name='motion_daemon', target=MotionData().detect_motion)
+# m_d.setDaemon(True)
+# m_d.start()
+# fr_d = threading.Thread(name='face_recognition_daemon', target=FaceData().start)
+# fr_d.setDaemon(True)
+# fr_d.start()
 
-# create_folders_if_not_exist()
-#
-# audio_recorded = threading.Event()
-# ar_d = threading.Thread(name='audio_recording_daemon',
-#                         target=AudioRecorder(audio_recorded).start)
-# ar_d.setDaemon(True)
-# ar_d.start()
-# vr_d = threading.Thread(name='voice_recognition_daemon', target=VoiceData(audio_recorded).start)
-# vr_d.setDaemon(True)
-# vr_d.start()
+create_folders_if_not_exist()
+
+audio_recorded = threading.Event()
+ar_d = threading.Thread(name='audio_recording_daemon',
+                        target=AudioRecorder(audio_recorded).start)
+ar_d.setDaemon(True)
+ar_d.start()
+vr_d = threading.Thread(name='voice_recognition_daemon', target=VoiceData(audio_recorded).start)
+vr_d.setDaemon(True)
+vr_d.start()
 
 
 # routes

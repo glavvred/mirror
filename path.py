@@ -21,3 +21,6 @@ def create_folders_if_not_exist():
 
     if not os.path.exists('logs'):
         os.makedirs('logs')
+
+    if not os.path.exists('recordings'):
+        os.makedirs('recordings')

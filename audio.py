@@ -10,6 +10,9 @@ from threading import Event
 import pyaudio  # pylint: disable=E0401
 
 import settings
+from toolbox import ToolBox
+
+logger = ToolBox.get_logger('audio')
 
 
 class AudioRecorder:
@@ -35,7 +38,7 @@ class AudioRecorder:
         :return: None
         """
         stream = self.stream
-        print("* Listening mic. ")
+        logger.info("* Listening mic. ")
         audio2send = []
         rel = settings.RATE / settings.CHUNK
         slid_win = deque(maxlen=int(settings.SILENCE_LIMIT * rel))
@@ -44,16 +47,15 @@ class AudioRecorder:
         started = False
         current_num = 0
         while num_phrases == -1 or current_num > 0:
-            threshold = settings.THRESHOLD
             cur_data = stream.read(settings.CHUNK)
             slid_win.append(math.sqrt(abs(audioop.avg(cur_data, 4))))
-            if sum(x > threshold for x in slid_win) > 0:  # silence is broken
+            if sum(x > settings.THRESHOLD for x in slid_win) > 0:  # silence is broken
                 if not started:
                     started = True
                 audio2send.append(cur_data)
             elif started is True:
                 self.save_file(list(prev_audio) + audio2send)
-                # self.play_audio() # testing
+                self.play_audio()  # testing
                 self.audio_recorded.set()  # flag for audio recognition daemon
                 # Reset all
                 started = False
@@ -61,7 +63,7 @@ class AudioRecorder:
                 prev_audio = deque(maxlen=int(0.5 * rel))
                 audio2send = []
                 current_num -= 1
-                print("Listening ...")
+                logger.info("Listening ...")
             else:
                 prev_audio.append(cur_data)
 
@@ -70,17 +72,16 @@ class AudioRecorder:
         Playback for testing
         :return:
         """
-        with wave.open(settings.AUDIO_FILENAME, 'rb') as wave_file:
-            stream = self.p.open(format=self.p.get_format_from_width(wave_file.getsampwidth()),
-                                 channels=wave_file.getnchannels(),
-                                 rate=wave_file.getframerate(),
+        with contextlib.closing(wave.open(settings.AUDIO_FILENAME, 'r')) as wave_file:
+            stream = self.p.open(format=settings.FORMAT,
+                                 channels=settings.CHANNELS,
+                                 rate=settings.RATE,
                                  output=True)
 
             while len(data := wave_file.readframes(settings.CHUNK)):
                 stream.write(data)
 
-            stream.close()
-            self.p.terminate()
+            wave_file.close()
 
     def save_file(self, data):
         """
@@ -100,7 +101,4 @@ class AudioRecorder:
         clear your tracks
         :return:
         """
-        print("* Done recording")
-        os.remove(settings.AUDIO_FILENAME)
-        self.stream.close()
-        self.p.terminate()
+        logger.info("* Done recording")

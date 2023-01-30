@@ -65,7 +65,6 @@ class FaceData:
         logging.debug('face recognition daemon started')
         while True:
             if settings.MOTION_DETECTED:
-                logging.debug(settings.MOTION_DETECTED)
                 self.recognize(settings.LAST_FRAME)
 
     def recognize(self, captured_image: string = ""):
