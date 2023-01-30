@@ -11,7 +11,6 @@ from audio import AudioRecorder
 from camera import CameraData
 from faces import FaceData
 from motion import MotionData
-from path import create_folders_if_not_exist
 from speech import VoiceData
 from toolbox import ToolBox
 
@@ -42,7 +41,7 @@ if session.query(Condition).count() == 0:  # пустая таблица conditi
 # fr_d.setDaemon(True)
 # fr_d.start()
 
-create_folders_if_not_exist()
+ToolBox.create_folders_if_not_exist()
 
 audio_recorded = threading.Event()
 ar_d = threading.Thread(name='audio_recording_daemon',
