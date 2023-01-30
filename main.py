@@ -13,6 +13,7 @@ from faces import FaceData
 from motion import MotionData
 from speech import VoiceData
 from toolbox import ToolBox
+from flaskwebgui import FlaskUI
 
 from users import UserMethods
 from weather import WeatherMethods
@@ -20,26 +21,29 @@ from dbase.models import Weather, Condition
 
 faulthandler.enable()
 app = Flask(__name__, static_url_path='/static')
+ui = FlaskUI(app, width=500, height=500)
+
 logger = ToolBox().get_logger("main", logging.DEBUG)
 
 session = DbConnect.get_session()
 if session.query(Condition).count() == 0:  # пустая таблица condition
     Condition.fill_base_data()
 
-# thread = threading.Thread(name='weather_daemon', target=WeatherMethods().start)
-# thread.setDaemon(True)
-# thread.start()
+
+thread = threading.Thread(name='weather_daemon', target=WeatherMethods().start)
+thread.setDaemon(True)
+thread.start()
 
 
-# c_d = threading.Thread(name='camera_daemon', target=CameraData().start)
-# c_d.setDaemon(True)
-# c_d.start()
-# m_d = threading.Thread(name='motion_daemon', target=MotionData().detect_motion)
-# m_d.setDaemon(True)
-# m_d.start()
-# fr_d = threading.Thread(name='face_recognition_daemon', target=FaceData().start)
-# fr_d.setDaemon(True)
-# fr_d.start()
+c_d = threading.Thread(name='camera_daemon', target=CameraData().start)
+c_d.setDaemon(True)
+c_d.start()
+m_d = threading.Thread(name='motion_daemon', target=MotionData().detect_motion)
+m_d.setDaemon(True)
+m_d.start()
+fr_d = threading.Thread(name='face_recognition_daemon', target=FaceData().start)
+fr_d.setDaemon(True)
+fr_d.start()
 
 ToolBox.create_folders_if_not_exist()
 
@@ -81,5 +85,4 @@ def weather():
 
 
 if __name__ == '__main__':
-    # pass
-    app.run(debug=True, use_reloader=False)
+    ui.run()

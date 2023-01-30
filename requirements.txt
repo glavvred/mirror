@@ -58,3 +58,5 @@ scikit-learn~=1.2.0
 # importlib-resources==5.10.2
 # itsdangerous==2.1.2
 # MarkupSafe==2.1.2
+
+flaskwebgui~=1.0.3

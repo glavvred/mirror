@@ -153,7 +153,8 @@ class VoiceData:
         """
         best_intent = self.model.predict(self.vectorizer.transform([voice_command]))[0]
         index_of_best_intent = list(self.classifier_probability.classes_).index(best_intent)
-        probabilities = self.classifier_probability.predict_proba(self.vectorizer.transform([voice_command]))[0]
+        probabilities = \
+        self.classifier_probability.predict_proba(self.vectorizer.transform([voice_command]))[0]
 
         best_intent_probability = probabilities[index_of_best_intent]
 
