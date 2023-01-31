@@ -23,6 +23,7 @@ IMAGE_STORAGE_UNKNOWN = path.join(getcwd(), 'upload\\unknown')
 AUDIO_FILENAME = path.join(getcwd(), 'recordings', 'record.wav')
 WEATHER_UPDATE_INTERVAL = 30  # minutes
 YANDEX_API_KEY = '8c9073a2-a106-4136-9cf8-54396aaf625f'
+YANDEX_GEOCODER_API_KEY = 'b7221eed-1eca-44f8-b906-1b7ee8b7dd55'
 CAMERA_ID_MAX = 10
 CAMERA_INTERVAL = 0.5
 LAST_FRAME = None
