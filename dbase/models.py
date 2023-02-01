@@ -171,3 +171,25 @@ class Face(BaseModel):
 
     filename = Column(String(100), nullable=False)
     user_id = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), nullable=False, index=True)
+
+
+class News(BaseModel):
+    """
+       news
+       """
+    __tablename__ = "news"
+
+    source = Column(String, nullable=False)
+    author = Column(String, nullable=True)
+    title = Column(String, nullable=False)
+
+    @staticmethod
+    def get_last(quantity= None):
+        """
+        get last news grab
+        :return:
+        """
+        if quantity:
+            return session.query(News).order_by(News.id.desc()).limit(quantity).all()
+        return session.query(News).order_by(News.id.desc()).first()
+

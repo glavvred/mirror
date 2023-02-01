@@ -37,3 +37,8 @@ DATABASE_PATH = f'{ROOT_DIR}\\dbase\\test_db.db'
 TIME_ZONE = pytz.timezone('Europe/Moscow')
 SQLALCHEMY_SILENCE_UBER_WARNING = 1
 INTENTS = 'models/intents.json'
+
+NEWS_UPDATE_INTERVAL = 30
+NEWS_API_KEY = '960ee20d99174704888e3cf88edafa8d'
+NEWS_SETTINGS = {'language': 'ru', 'sources': 'google-news-ru'}
+NEWS_COUNT = 7

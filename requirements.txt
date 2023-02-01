@@ -14,14 +14,14 @@ pytz==2022.7.1
 pytz-deprecation-shim==0.1.0.post0
 requests==2.28.2
 SpeechRecognition==3.9.0
-SQLAlchemy==1.4.46
+SQLAlchemy==2.0.0
 vosk==0.3.45
 Werkzeug==2.2.2
-pip==22.3.1
+pip==23.0
 wheel==0.38.4
 future==0.18.3
 sklearn~=0.0.post1
-scikit-learn~=1.2.0
+scikit-learn==1.2.1
 # pefile==2022.5.30
 # Pillow==9.4.0
 # pycparser==2.21
@@ -59,4 +59,4 @@ scikit-learn~=1.2.0
 # itsdangerous==2.1.2
 # MarkupSafe==2.1.2
 
-flaskwebgui~=1.0.3
+newsapi~=0.1.1
