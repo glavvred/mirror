@@ -58,5 +58,6 @@ scikit-learn==1.2.1
 # importlib-resources==5.10.2
 # itsdangerous==2.1.2
 # MarkupSafe==2.1.2
-
+newsapi-python~=0.2.6
+flaskwebgui~=1.0.3
 newsapi~=0.1.1

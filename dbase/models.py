@@ -184,7 +184,7 @@ class News(BaseModel):
     title = Column(String, nullable=False)
 
     @staticmethod
-    def get_last(quantity= None):
+    def get_last(quantity=None):
         """
         get last news grab
         :return:
@@ -192,4 +192,3 @@ class News(BaseModel):
         if quantity:
             return session.query(News).order_by(News.id.desc()).limit(quantity).all()
         return session.query(News).order_by(News.id.desc()).first()
-

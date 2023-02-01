@@ -28,6 +28,7 @@ logger = ToolBox().get_logger("main", logging.DEBUG)
 session = DbConnect.get_session()
 if session.query(Condition).count() == 0:  # пустая таблица condition
     Condition.fill_base_data()
+ToolBox.create_folders_if_not_exist()
 
 
 thread = threading.Thread(name='weather_daemon', target=WeatherMethods().start)
@@ -45,7 +46,6 @@ fr_d = threading.Thread(name='face_recognition_daemon', target=FaceData().start)
 fr_d.setDaemon(True)
 fr_d.start()
 
-ToolBox.create_folders_if_not_exist()
 
 audio_recorded = threading.Event()
 ar_d = threading.Thread(name='audio_recording_daemon',
@@ -56,8 +56,6 @@ vr_d = threading.Thread(name='voice_recognition_daemon', target=VoiceData(audio_
 vr_d.setDaemon(True)
 vr_d.start()
 
-
-# routes
 
 @app.route('/api/users/new', methods=['POST'])
 def users_new():

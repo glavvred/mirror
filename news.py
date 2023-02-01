@@ -1,5 +1,3 @@
-import sys
-
 from newsapi import NewsApiClient
 from dbase.connection import DbConnect
 from dbase.models import News
@@ -37,7 +35,6 @@ class NewsMethods:
         logger.debug('news daemon started')
         while True:
             time_delta = datetime.datetime.now(tz=TIME_ZONE) - TIME_ZONE.fromutc(self.last_grab)
-            print(time_delta.seconds)
             if time_delta.seconds > NEWS_UPDATE_INTERVAL * 60:
                 self.grab_and_store()
                 time.sleep(5)
