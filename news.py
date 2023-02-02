@@ -51,3 +51,7 @@ class NewsMethods:
             session.add(news_item)
             session.commit()
         return news_item
+
+    @staticmethod
+    def get_last(count=None):
+        return News.get_last(count)

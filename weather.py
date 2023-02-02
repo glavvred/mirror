@@ -5,7 +5,6 @@ import time
 
 import requests
 
-import models
 from dbase.connection import DbConnect
 from dbase.models import Weather, ForecastPart, Condition
 from settings import TIME_ZONE, WEATHER_UPDATE_INTERVAL, YANDEX_API_KEY
@@ -106,6 +105,10 @@ class WeatherMethods:
             logger.debug('weather grabbing done')
         else:
             logger.debug('wait for another day')
+
+    @staticmethod
+    def get_last():
+        return Weather.get_last()
 
     def __del__(self):
         """
