@@ -1,6 +1,7 @@
 import sys
 import tkinter as tk
 from tkinter import *
+from PIL import ImageTk, Image
 import time
 
 from news import NewsMethods
@@ -15,7 +16,7 @@ class Clock:
 
     def __init__(self, root):
         clock_date_node = tk.Frame(root)
-        clock_date_node.configure(background='blue')
+        clock_date_node.configure(background='black')
         clock_date_node.pack(side=LEFT, padx=15)
         date_node = tk.Frame(clock_date_node, bg='black')
         date_node.pack()
@@ -87,8 +88,11 @@ class NewsNode:
         news_widget = tk.Frame(news_node, height=NEWS_COUNT, width=100, bg='black')
 
         for article in NewsMethods.get_last(NEWS_COUNT):
+            news_image = Image.open('static/assets/PartlySunny.png').resize((20, 20))
+            news_image = ImageTk.PhotoImage(news_image)
+            #todo from here
             article_node = tk.Label(news_widget, font=('Tahoma', 10), bg='black', fg='white',
-                                    text=article.title)
+                                    text=article.title, compound=CENTER, image=news_image)
             article_node.pack(in_=news_widget, anchor=E, side=TOP)
 
         news_widget.pack()
@@ -102,6 +106,8 @@ def leave(event):
 class WeatherNode:
     def __init__(self, root):
         weather = WeatherMethods.get_last()
+        print(weather.temperature, weather.feels_like, weather.feels_like, weather.wind_speed, weather.wind_dir)
+        # exit()
         weather_node = tk.Frame(root, height=30, width=100, bg='green')
         weather_node.pack(side=RIGHT, fill="x")
 
@@ -119,6 +125,7 @@ class WeatherNode:
 
 if __name__ == '__main__':
     SplashScreen()
+    # NewsMethods().start()
 
     root_node = tk.Tk()
     root_node.bind('<Escape>', leave)
