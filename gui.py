@@ -1,8 +1,10 @@
 import sys
+import time
 import tkinter as tk
 from tkinter import *
+from tkinter import ttk
+
 from PIL import ImageTk, Image
-import time
 
 from news import NewsMethods
 from settings import NEWS_COUNT
@@ -57,14 +59,17 @@ class Clock:
 
 class SplashScreen:
     def __init__(self):
-        # splash screen
-        startupscreen = tk.Tk()
+        startupscreen = self.startupscreen = tk.Tk()
+        self.progress = DoubleVar(value=0)
         startupscreen.title('Mirror Mirror')
-        welcometext = tk.Label(startupscreen, font=('arial', 40), bg='black', fg='white')
         startupscreen.configure(background='black')
         startupscreen.overrideredirect(True)
+        welcometext = tk.Label(startupscreen, font=('arial', 40), bg='black', fg='white')
         welcometext.config(text='Hello dearest')
-        welcometext.pack(side=LEFT, padx=120, pady=80)
+        welcometext.pack(side=TOP, padx=120, pady=20)
+        self.progressbar = ttk.Progressbar(startupscreen, orient='horizontal', mode='determinate',
+                                           length=280, variable=self.progress)
+        self.progressbar.pack(side=TOP, padx=20, pady=10)
         # Gets the requested values of the height and width.
         windowWidth = startupscreen.winfo_reqwidth()
         windowHeight = startupscreen.winfo_reqheight()
@@ -75,25 +80,30 @@ class SplashScreen:
         # Positions the window in the center of the page.
         startupscreen.geometry("+{}+{}".format(positionRight, positionDown))
         startupscreen.update()
-        # load daemons, display progressbar
-        startupscreen.destroy()
+
+    def end(self):
+        print('here')
+        self.startupscreen.destroy()
+
+    def increase(self, increment: float):
+        self.progress.set(self.progress.get() + increment)
+        self.startupscreen.update()
 
 
 class NewsNode:
     def __init__(self, root):
         news_node = tk.Frame(root)
         news_node.configure(background='black')
-        news_node.pack(anchor=E, padx=15)
-
+        news_node.pack(anchor=E, padx=5)
         news_widget = tk.Frame(news_node, height=NEWS_COUNT, width=100, bg='black')
-
         for article in NewsMethods.get_last(NEWS_COUNT):
-            news_image = Image.open('static/assets/PartlySunny.png').resize((20, 20))
-            news_image = ImageTk.PhotoImage(news_image)
-            #todo from here
+            news_image = Image.open('static/assets/Newspaper.png')
+            news_image = ImageTk.PhotoImage(news_image.resize((20, 20), Image.LANCZOS))
             article_node = tk.Label(news_widget, font=('Tahoma', 10), bg='black', fg='white',
-                                    text=article.title, compound=CENTER, image=news_image)
-            article_node.pack(in_=news_widget, anchor=E, side=TOP)
+                                    width=400, padx=5, text=article.title, compound=LEFT,
+                                    image=news_image)
+            article_node.image = news_image
+            article_node.pack(in_=news_widget, side=TOP, expand=True, padx=0, pady=0)
 
         news_widget.pack()
 
@@ -104,32 +114,59 @@ def leave(event):
 
 
 class WeatherNode:
+    directions = {"n": "↑ N", "ne": "↗ NE", "e": "→ E", "se": "↘ SE", "s": "↓ S", "sw": "↙ SW",
+                  "w": "← W", "nw": "↖ NW"}
+
     def __init__(self, root):
         weather = WeatherMethods.get_last()
-        print(weather.temperature, weather.feels_like, weather.feels_like, weather.wind_speed, weather.wind_dir)
-        # exit()
+        print(weather.temperature, weather.feels_like, weather.feels_like, weather.wind_speed,
+              weather.wind_dir)
         weather_node = tk.Frame(root, height=30, width=100, bg='green')
         weather_node.pack(side=RIGHT, fill="x")
 
-        weather_widget = tk.Label(weather_node, bg='green', text='adasdasda sdasda'
-                                                                 'asdasdasdasd'
-                                                                 'asdasdasd\r\n'
-                                                                 'asdasdasda'
-                                                                 ''
-                                                                 'asdasd\r\n'
-                                                                 ''
-                                                                 'asdasd'
-                                                                 'asd ')
-        weather_widget.pack()
+        # sunrise - sunset
+        if int(time.strftime("%H")) > 12:
+            sunrise_text = f'{weather.sunset:%H:%M}'
+        else:
+            sunrise_text = f'{weather.sunrise:%H:%M}'
+        sunrise_image = Image.open('static/assets/Sunrise.png')
+        sunrise_image = ImageTk.PhotoImage(sunrise_image.resize((30, 30), Image.LANCZOS))
+        sunrise_node = tk.Label(weather_node, font=('Tahoma', 20), bg='green', fg='white',
+                                padx=5, text=sunrise_text, compound=LEFT, image=sunrise_image)
+        sunrise_node.image = sunrise_image
+        sunrise_node.pack(in_=weather_node, anchor=E, side=LEFT)
+
+        # wind dir and speed
+        wind_text = self.directions[weather.wind_dir]
+        wind_image = Image.open('static/assets/Wind.png')
+        wind_image = ImageTk.PhotoImage(wind_image.resize((30, 30), Image.LANCZOS))
+        wind_node = tk.Label(weather_node, font=('Tahoma', 20), bg='#007700', fg='white',
+                             padx=5, text=wind_text, compound=LEFT, image=wind_image)
+        wind_node.image = wind_image
+        wind_node.pack(in_=weather_node, anchor=E, side=LEFT)
+
+        #
 
 
 if __name__ == '__main__':
-    SplashScreen()
+    ss = SplashScreen()
     # NewsMethods().start()
+    ss.increase(20)
+    # load daemons
+    time.sleep(0.5)
+    ss.increase(20)
+    time.sleep(0.5)
+    ss.increase(20)
+    time.sleep(0.5)
+    ss.increase(20)
+    time.sleep(0.5)
+    ss.increase(20)
+    time.sleep(0.5)
+    ss.end()
 
     root_node = tk.Tk()
     root_node.bind('<Escape>', leave)
-    # root.attributes("-fullscreen", True)
+    # root_node.attributes("-fullscreen", True)
     root_node.configure(background='black')
 
     top_row = tk.Frame(root_node, bg='#550000')

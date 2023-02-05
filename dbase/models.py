@@ -179,7 +179,7 @@ class News(BaseModel):
        """
     __tablename__ = "news"
 
-    source = Column(String, nullable=False)
+    source = Column(String, nullable=True)
     author = Column(String, nullable=True)
     title = Column(String, nullable=False)
 

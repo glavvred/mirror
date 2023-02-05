@@ -2,7 +2,6 @@
 import faulthandler
 import logging
 import threading
-from pprint import pprint
 
 from flask import Flask, render_template
 from dbase.connection import DbConnect
@@ -13,7 +12,6 @@ from faces import FaceData
 from motion import MotionData
 from speech import VoiceData
 from toolbox import ToolBox
-from flaskwebgui import FlaskUI
 
 from users import UserMethods
 from weather import WeatherMethods
@@ -21,7 +19,6 @@ from dbase.models import Weather, Condition
 
 faulthandler.enable()
 app = Flask(__name__, static_url_path='/static')
-ui = FlaskUI(app, width=500, height=500)
 
 logger = ToolBox().get_logger("main", logging.DEBUG)
 
@@ -83,4 +80,4 @@ def weather():
 
 
 if __name__ == '__main__':
-    ui.run()
+    app.run()

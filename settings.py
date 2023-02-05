@@ -40,5 +40,5 @@ INTENTS = 'models/intents.json'
 
 NEWS_UPDATE_INTERVAL = 30
 NEWS_API_KEY = '960ee20d99174704888e3cf88edafa8d'
-NEWS_SETTINGS = {'language': 'ru', 'sources': 'google-news-ru'}
+NEWS_SETTINGS = {'language': 'ru'}
 NEWS_COUNT = 7
