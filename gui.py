@@ -92,18 +92,20 @@ class SplashScreen:
 
 class NewsNode:
     def __init__(self, root):
-        news_node = tk.Frame(root)
-        news_node.configure(background='black')
-        news_node.pack(anchor=E, padx=5)
-        news_widget = tk.Frame(news_node, height=NEWS_COUNT, width=100, bg='black')
+        import textwrap
+
+        news_node = tk.Frame(root, background='black')
+        news_node.pack(anchor=E)
+        news_widget = tk.Frame(news_node, height=NEWS_COUNT, bg='black', pady=20)
         for article in NewsMethods.get_last(NEWS_COUNT):
             news_image = Image.open('static/assets/Newspaper.png')
             news_image = ImageTk.PhotoImage(news_image.resize((20, 20), Image.LANCZOS))
+            article_text = textwrap.fill(article.title, break_long_words=False, break_on_hyphens=False)
             article_node = tk.Label(news_widget, font=('Tahoma', 10), bg='black', fg='white',
-                                    width=400, padx=5, text=article.title, compound=LEFT,
-                                    image=news_image)
+                                    width=500, text=article_text, compound=LEFT, image=news_image,
+                                    justify=RIGHT, anchor=E, padx=5)
             article_node.image = news_image
-            article_node.pack(in_=news_widget, side=TOP, expand=True, padx=0, pady=0)
+            article_node.pack(in_=news_widget, anchor=E, side=TOP, padx=0, pady=0)
 
         news_widget.pack()
 
@@ -114,15 +116,17 @@ def leave(event):
 
 
 class WeatherNode:
-    directions = {"n": "↑ N", "ne": "↗ NE", "e": "→ E", "se": "↘ SE", "s": "↓ S", "sw": "↙ SW",
-                  "w": "← W", "nw": "↖ NW"}
+    directions = {"n": "↑", "ne": "↗", "e": "→", "se": "↘", "s": "↓", "sw": "↙", "w": "←", "nw": "↖"}
+    day_parts = {"morning": "утро", "day": "день", "evening": "вечер", "night": "ночь"}
 
     def __init__(self, root):
         weather = WeatherMethods.get_last()
-        print(weather.temperature, weather.feels_like, weather.feels_like, weather.wind_speed,
-              weather.wind_dir)
-        weather_node = tk.Frame(root, height=30, width=100, bg='green')
-        weather_node.pack(side=RIGHT, fill="x")
+
+        weather_node = tk.Frame(root, height=30, width=100, bg='black')
+        weather_node.pack(side=RIGHT)
+
+        top_frame = tk.Frame(weather_node, height=30, width=150, bg='black')
+        top_frame.pack(in_=weather_node, side=TOP, fill="x")
 
         # sunrise - sunset
         if int(time.strftime("%H")) > 12:
@@ -130,22 +134,58 @@ class WeatherNode:
         else:
             sunrise_text = f'{weather.sunrise:%H:%M}'
         sunrise_image = Image.open('static/assets/Sunrise.png')
-        sunrise_image = ImageTk.PhotoImage(sunrise_image.resize((30, 30), Image.LANCZOS))
-        sunrise_node = tk.Label(weather_node, font=('Tahoma', 20), bg='green', fg='white',
+        sunrise_image = ImageTk.PhotoImage(sunrise_image.resize((20, 20), Image.LANCZOS))
+        sunrise_node = tk.Label(top_frame, font=('Tahoma', 20), bg='black', fg='white',
                                 padx=5, text=sunrise_text, compound=LEFT, image=sunrise_image)
         sunrise_node.image = sunrise_image
-        sunrise_node.pack(in_=weather_node, anchor=E, side=LEFT)
+        sunrise_node.pack(in_=top_frame, side=LEFT, fill='x', expand=True)
+
+        # wind gust
+        wind_gust_text = f'({weather.wind_gust})'
+        wind_gust_node = tk.Label(top_frame, font=('Tahoma', 15), bg='black', fg='white',
+                                  text=wind_gust_text, compound=LEFT)
+        wind_gust_node.pack(in_=top_frame, side=RIGHT)
 
         # wind dir and speed
-        wind_text = self.directions[weather.wind_dir]
+        wind_text = f'{self.directions[weather.wind_dir]} {weather.wind_speed}м/с'
         wind_image = Image.open('static/assets/Wind.png')
-        wind_image = ImageTk.PhotoImage(wind_image.resize((30, 30), Image.LANCZOS))
-        wind_node = tk.Label(weather_node, font=('Tahoma', 20), bg='#007700', fg='white',
-                             padx=5, text=wind_text, compound=LEFT, image=wind_image)
+        wind_image = ImageTk.PhotoImage(wind_image.resize((20, 20), Image.LANCZOS))
+        wind_node = tk.Label(top_frame, font=('Tahoma', 20), bg='black', fg='white',
+                             text=wind_text, compound=LEFT, image=wind_image)
         wind_node.image = wind_image
-        wind_node.pack(in_=weather_node, anchor=E, side=LEFT)
+        wind_node.pack(in_=top_frame, side=RIGHT, fill='x', expand=True)
 
-        #
+        # mid frame
+        middle_frame = tk.Frame(weather_node, height=30, width=100, bg='black')
+        middle_frame.pack(in_=weather_node, side=TOP, fill='x')
+
+        # temp - feels_like now
+        text_feels_like = f'({weather.feels_like})'
+        temp_feels_like = tk.Label(middle_frame, font=('Tahoma', 20), bg='black', fg='white',
+                                   padx=5, compound=RIGHT, text=text_feels_like)
+        temp_feels_like.pack(in_=middle_frame, side=RIGHT)
+
+        # condition now
+        condition_image = Image.open(f'static/assets/{weather.condition.icon}.png')
+        condition_image = ImageTk.PhotoImage(condition_image.resize((50, 50), Image.LANCZOS))
+        temp_text = str(weather.temperature) + '°'
+        temp_node = tk.Label(middle_frame, font=('Tahoma', 40), bg='black', fg='white',
+                             padx=5, text=temp_text, compound=LEFT, image=condition_image)
+        temp_node.image = condition_image
+        temp_node.pack(in_=middle_frame, side=RIGHT)
+
+        lower_frame = tk.Frame(weather_node, bg='green')
+        lower_frame.pack(in_=weather_node, side=BOTTOM, anchor=E)
+
+        for forecast_part in weather.forecast_parts:
+            p_condition_image = Image.open(f'static/assets/{forecast_part.condition.icon}.png')
+            p_condition_image = ImageTk.PhotoImage(p_condition_image.resize((15, 15), Image.LANCZOS))
+            p_temp_text = f' {self.day_parts[forecast_part.part_name]} {forecast_part.temp_min}°/' \
+                          f'{forecast_part.temp_max}° ({forecast_part.feels_like})'
+            p_temp_node = tk.Label(lower_frame, font=('Tahoma', 15), bg='black', fg='white',
+                                   text=p_temp_text, anchor=E, compound=LEFT, image=p_condition_image)
+            p_temp_node.image = p_condition_image
+            p_temp_node.pack(in_=lower_frame, anchor=E, side=TOP, fill='x', expand=True)
 
 
 if __name__ == '__main__':
@@ -153,15 +193,15 @@ if __name__ == '__main__':
     # NewsMethods().start()
     ss.increase(20)
     # load daemons
-    time.sleep(0.5)
-    ss.increase(20)
-    time.sleep(0.5)
-    ss.increase(20)
-    time.sleep(0.5)
-    ss.increase(20)
-    time.sleep(0.5)
-    ss.increase(20)
-    time.sleep(0.5)
+    # time.sleep(0.5)
+    # ss.increase(20)
+    # time.sleep(0.5)
+    # ss.increase(20)
+    # time.sleep(0.5)
+    # ss.increase(20)
+    # time.sleep(0.5)
+    # ss.increase(20)
+    # time.sleep(0.5)
     ss.end()
 
     root_node = tk.Tk()
