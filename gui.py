@@ -1,14 +1,28 @@
+import faulthandler
+import logging
+import threading
 import sys
 import time
+
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 
 from PIL import ImageTk, Image
 
+import settings
 from news import NewsMethods
 from settings import NEWS_COUNT
 from weather import WeatherMethods
+from audio import AudioRecorder
+from camera import CameraData
+from faces import FaceData
+from motion import MotionData
+from speech import VoiceData
+from toolbox import ToolBox
+
+from dbase.connection import DbConnect
+from dbase.models import Weather, Condition
 
 
 class Clock:
@@ -82,7 +96,6 @@ class SplashScreen:
         startupscreen.update()
 
     def end(self):
-        print('here')
         self.startupscreen.destroy()
 
     def increase(self, increment: float):
@@ -112,6 +125,7 @@ class NewsNode:
 
 def leave(event):
     root_node.destroy()
+    #destroy daemons
     sys.exit()
 
 
@@ -188,25 +202,71 @@ class WeatherNode:
             p_temp_node.pack(in_=lower_frame, anchor=E, side=TOP, fill='x', expand=True)
 
 
+class FaceNode:
+    def __init__(self, root):
+        face_node = tk.Frame(root, height=30, width=100, bg='red')
+        face_node.pack(side=LEFT)
+        self.motion_detected_node = tk.Label(root, font=('Tahoma', 15), bg='black', fg='white')
+        self.motion_detected_node.pack(in_=face_node, side=LEFT)
+
+    def show_frames(self):
+        imgtk = ImageTk.PhotoImage(image=Image.fromarray(settings.LAST_FRAME))
+        self.motion_detected_node.imgtk = imgtk
+        self.motion_detected_node.configure(image=imgtk)
+        self.motion_detected_node.after(10, self.show_frames())
+
+
 if __name__ == '__main__':
     ss = SplashScreen()
-    # NewsMethods().start()
-    ss.increase(20)
     # load daemons
-    # time.sleep(0.5)
-    # ss.increase(20)
-    # time.sleep(0.5)
-    # ss.increase(20)
-    # time.sleep(0.5)
-    # ss.increase(20)
-    # time.sleep(0.5)
-    # ss.increase(20)
-    # time.sleep(0.5)
+    faulthandler.enable()
+    logger = ToolBox().get_logger("main", logging.DEBUG)
+
+    session = DbConnect.get_session()
+    if session.query(Condition).count() == 0:  # пустая таблица condition
+        Condition.fill_base_data()
+    ToolBox.create_folders_if_not_exist()
+    time.sleep(0.2)
+    ss.increase(20)
+
+    thread = threading.Thread(name='news_daemon', target=NewsMethods().start)
+    thread.setDaemon(True)
+    thread.start()
+    ss.increase(20)
+
+    thread = threading.Thread(name='weather_daemon', target=WeatherMethods().start)
+    thread.setDaemon(True)
+    thread.start()
+    time.sleep(0.2)
+    ss.increase(20)
+
+    c_d = threading.Thread(name='camera_daemon', target=CameraData().start)
+    c_d.setDaemon(True)
+    c_d.start()
+    m_d = threading.Thread(name='motion_daemon', target=MotionData().detect_motion)
+    m_d.setDaemon(True)
+    m_d.start()
+    fr_d = threading.Thread(name='face_recognition_daemon', target=FaceData().start)
+    fr_d.setDaemon(True)
+    fr_d.start()
+    time.sleep(0.2)
+    ss.increase(20)
+
+    audio_recorded = threading.Event()
+    ar_d = threading.Thread(name='audio_recording_daemon',
+                            target=AudioRecorder(audio_recorded).start)
+    ar_d.setDaemon(True)
+    ar_d.start()
+    vr_d = threading.Thread(name='voice_recognition_daemon', target=VoiceData(audio_recorded).start)
+    vr_d.setDaemon(True)
+    vr_d.start()
+    time.sleep(0.2)
+    ss.increase(20)
     ss.end()
 
     root_node = tk.Tk()
     root_node.bind('<Escape>', leave)
-    # root_node.attributes("-fullscreen", True)
+    root_node.attributes("-fullscreen", True)
     root_node.configure(background='black')
 
     top_row = tk.Frame(root_node, bg='#550000')
@@ -220,6 +280,10 @@ if __name__ == '__main__':
     clock = Clock(top_row)
 
     NewsNode(mid_row)
+    face = FaceNode(mid_row)
+
+    f_d = threading.Thread(name='face_show_daemon', target=face.show_frames)
+    f_d.start()
 
     while True:
         clock.hour_timer()
