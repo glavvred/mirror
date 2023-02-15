@@ -23,7 +23,6 @@ future==0.18.3
 sklearn~=0.0.post1
 scikit-learn==1.2.1
 # pefile==2022.5.30
-# Pillow==9.4.0
 # pycparser==2.21
 # pyinstaller==5.7.0
 # pyinstaller-hooks-contrib==2022.15
@@ -59,7 +58,6 @@ scikit-learn==1.2.1
 # itsdangerous==2.1.2
 # MarkupSafe==2.1.2
 newsapi-python~=0.2.6
-flaskwebgui~=1.0.3
-# newsapi~=0.1.1
+# flaskwebgui~=1.0.3
 Pillow~=9.4.0
 newsapi~=0.1.1
