@@ -113,7 +113,8 @@ class NewsNode:
         for article in NewsMethods.get_last(NEWS_COUNT):
             news_image = Image.open('static/assets/Newspaper.png')
             news_image = ImageTk.PhotoImage(news_image.resize((20, 20), Image.LANCZOS))
-            article_text = textwrap.fill(article.title, break_long_words=False, break_on_hyphens=False)
+            article_text = textwrap.fill(article.title, break_long_words=False,
+                                         break_on_hyphens=False)
             article_node = tk.Label(news_widget, font=('Tahoma', 10), bg='black', fg='white',
                                     width=500, text=article_text, compound=LEFT, image=news_image,
                                     justify=RIGHT, anchor=E, padx=5)
@@ -125,12 +126,13 @@ class NewsNode:
 
 def leave(event):
     root_node.destroy()
-    #destroy daemons
+    # destroy daemons
     sys.exit()
 
 
 class WeatherNode:
-    directions = {"n": "↑", "ne": "↗", "e": "→", "se": "↘", "s": "↓", "sw": "↙", "w": "←", "nw": "↖"}
+    directions = {"n": "↑", "ne": "↗", "e": "→", "se": "↘", "s": "↓", "sw": "↙", "w": "←",
+                  "nw": "↖"}
     day_parts = {"morning": "утро", "day": "день", "evening": "вечер", "night": "ночь"}
 
     def __init__(self, root):
@@ -193,11 +195,13 @@ class WeatherNode:
 
         for forecast_part in weather.forecast_parts:
             p_condition_image = Image.open(f'static/assets/{forecast_part.condition.icon}.png')
-            p_condition_image = ImageTk.PhotoImage(p_condition_image.resize((15, 15), Image.LANCZOS))
+            p_condition_image = ImageTk.PhotoImage(
+                p_condition_image.resize((15, 15), Image.LANCZOS))
             p_temp_text = f' {self.day_parts[forecast_part.part_name]} {forecast_part.temp_min}°/' \
                           f'{forecast_part.temp_max}° ({forecast_part.feels_like})'
             p_temp_node = tk.Label(lower_frame, font=('Tahoma', 15), bg='black', fg='white',
-                                   text=p_temp_text, anchor=E, compound=LEFT, image=p_condition_image)
+                                   text=p_temp_text, anchor=E, compound=LEFT,
+                                   image=p_condition_image)
             p_temp_node.image = p_condition_image
             p_temp_node.pack(in_=lower_frame, anchor=E, side=TOP, fill='x', expand=True)
 
