@@ -269,9 +269,9 @@ if __name__ == '__main__':
     root_node.attributes("-fullscreen", True)
     root_node.configure(background='black')
 
-    top_row = tk.Frame(root_node, bg='#550000')
-    mid_row = tk.Frame(root_node, bg='#005500')
-    bot_row = tk.Frame(root_node, bg='#000055', height=70)
+    top_row = tk.Frame(root_node, bg='black')
+    mid_row = tk.Frame(root_node, bg='black')
+    bot_row = tk.Frame(root_node, bg='black', height=70)
     top_row.pack(side=TOP, fill="x", expand=False)
     mid_row.pack(side=TOP, fill="both", expand=True)
     bot_row.pack(side=BOTTOM, fill="x", expand=False)
