@@ -55,5 +55,5 @@ class MotionData:
                                             cv2.CHAIN_APPROX_SIMPLE)
                 contours = imutils.grab_contours(contours)
                 for contour in contours:
-                    if cv2.contourArea(contour) > 10000:
+                    if cv2.contourArea(contour) > 500:
                         settings.MOTION_DETECTED = True

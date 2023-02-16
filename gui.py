@@ -4,6 +4,7 @@ import threading
 import sys
 import time
 
+import numpy as np
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
@@ -22,7 +23,7 @@ from speech import VoiceData
 from toolbox import ToolBox
 
 from dbase.connection import DbConnect
-from dbase.models import Weather, Condition
+from dbase.models import Condition, User
 
 
 class Clock:
@@ -85,14 +86,14 @@ class SplashScreen:
                                            length=280, variable=self.progress)
         self.progressbar.pack(side=TOP, padx=20, pady=10)
         # Gets the requested values of the height and width.
-        windowWidth = startupscreen.winfo_reqwidth()
-        windowHeight = startupscreen.winfo_reqheight()
+        window_width = startupscreen.winfo_reqwidth()
+        window_height = startupscreen.winfo_reqheight()
         # Gets both half the screen width/height and window width/height
-        positionRight = int(startupscreen.winfo_screenwidth() / 3 - windowWidth / 2)
-        positionDown = int(startupscreen.winfo_screenheight() / 2 - windowHeight / 2)
+        position_right = int(startupscreen.winfo_screenwidth() / 3 - window_width / 2)
+        position_down = int(startupscreen.winfo_screenheight() / 2 - window_height / 2)
 
         # Positions the window in the center of the page.
-        startupscreen.geometry("+{}+{}".format(positionRight, positionDown))
+        startupscreen.geometry("+{}+{}".format(position_right, position_down))
         startupscreen.update()
 
     def end(self):
@@ -208,16 +209,58 @@ class WeatherNode:
 
 class FaceNode:
     def __init__(self, root):
+        from collections import deque
         face_node = tk.Frame(root, height=30, width=100, bg='red')
         face_node.pack(side=LEFT)
-        self.motion_detected_node = tk.Label(root, font=('Tahoma', 15), bg='black', fg='white')
-        self.motion_detected_node.pack(in_=face_node, side=LEFT)
+        self.webcam_image_node = tk.Label(root, font=('Tahoma', 15), bg='black', fg='white')
+        self.webcam_image_node.pack(in_=face_node, side=LEFT)
+        self.movement_detected_node = tk.Label(root, font=('Tahoma', 15), bg='black', fg='white')
+        self.movement_detected_node.pack(in_=face_node, side=LEFT)
+        self.face_detected_node = tk.Label(root, font=('Tahoma', 15), bg='black', fg='white')
+        self.face_detected_node.pack(in_=face_node, side=LEFT)
+        self.frame_times = deque([0] * 5)
+        self.current_frame = settings.LAST_FRAME
 
-    def show_frames(self):
-        imgtk = ImageTk.PhotoImage(image=Image.fromarray(settings.LAST_FRAME))
-        self.motion_detected_node.imgtk = imgtk
-        self.motion_detected_node.configure(image=imgtk)
-        self.motion_detected_node.after(10, self.show_frames())
+    def show_webcam(self):
+        if np.array_equal(self.current_frame, settings.LAST_FRAME):
+            pass
+        self.current_frame = settings.LAST_FRAME
+
+        self.frame_times.rotate()
+        self.frame_times[0] = time.time()
+        sum_of_deltas = self.frame_times[0] - self.frame_times[-1]
+        count_of_deltas = len(self.frame_times) - 1
+        try:
+            fps = int(float(count_of_deltas) / sum_of_deltas)
+        except ZeroDivisionError:
+            fps = 0
+
+        rgb_weights = [0.2989, 0.5870, 0.1140]
+        grayscale_image = np.dot(settings.LAST_FRAME, rgb_weights)
+        face_image = ImageTk.PhotoImage(image=Image.fromarray(grayscale_image))
+        self.webcam_image_node.config(image=face_image, text='FPS: {}'.format(fps), compound='bottom')
+        self.webcam_image_node.image = face_image
+        self.webcam_image_node._image_cache = face_image
+
+        self.webcam_image_node.after(10, func=lambda: self.show_webcam())
+
+    def movement_detected(self):
+        if settings.MOTION_DETECTED:
+            self.movement_detected_node.config(text='movement')
+        else:
+            self.movement_detected_node.config(text='still')
+        self.movement_detected_node.after(10, func=lambda: self.movement_detected())
+
+    def face_detected(self):
+        if settings.MATCHED_USERS:
+            greetings = ''
+            for face_id in settings.MATCHED_USERS:
+                user = session.query(User).filter(User.id == face_id).first()
+                greetings = f'{greetings}, {user.name}, have a good day'
+            self.face_detected_node.config(text=f'hello {greetings}')
+        else:
+            self.face_detected_node.config(text='no face')
+        self.face_detected_node.after(10, func=lambda: self.face_detected())
 
 
 if __name__ == '__main__':
@@ -285,9 +328,12 @@ if __name__ == '__main__':
 
     NewsNode(mid_row)
     face = FaceNode(mid_row)
-
-    f_d = threading.Thread(name='face_show_daemon', target=face.show_frames)
-    f_d.start()
+    face_t = threading.Thread(name='webcam_image', target=face.show_webcam())
+    face_t.start()
+    # face_t2 = threading.Thread(name='webcam_image2', target=face.movement_detected())
+    # face_t2.start()
+    face_t3 = threading.Thread(name='webcam_image3', target=face.face_detected())
+    face_t3.start()
 
     while True:
         clock.hour_timer()

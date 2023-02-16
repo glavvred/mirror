@@ -87,4 +87,4 @@ class FaceData:
                         matched_users.append(self.get_user_by_key(index_key))
                     index_key = index_key + 1
 
-        self.matched_users = matched_users
+        settings.MATCHED_USERS = matched_users
