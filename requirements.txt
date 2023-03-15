@@ -61,3 +61,4 @@ newsapi-python~=0.2.6
 # flaskwebgui~=1.0.3
 Pillow~=9.4.0
 newsapi~=0.1.1
+transitions~=0.9.0

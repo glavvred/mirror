@@ -12,6 +12,7 @@ from tkinter import ttk
 from PIL import ImageTk, Image
 
 import settings
+from mirror import Mirror
 from news import NewsMethods
 from settings import NEWS_COUNT
 from weather import WeatherMethods
@@ -264,9 +265,11 @@ class FaceNode:
 
 
 if __name__ == '__main__':
+
     ss = SplashScreen()
     # load daemons
     faulthandler.enable()
+    mirror = ToolBox().start_mirror()
     logger = ToolBox().get_logger("main", logging.DEBUG)
 
     session = DbConnect.get_session()

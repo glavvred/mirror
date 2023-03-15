@@ -11,6 +11,7 @@ from toolbox import ToolBox
 
 session = DbConnect.get_session()
 logger = ToolBox.get_logger('motion')
+mirror = ToolBox.start_mirror()
 
 
 class MotionData:
