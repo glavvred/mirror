@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import string
+import time
 from os import path, getcwd
 
 # https://github.com/ageitgey/face_recognition
@@ -30,6 +31,7 @@ class FaceData:
         self.face_user_names = {}
         # init load
         self.load_known()
+        self.last_recognize_time = time.time()
 
     def get_user_by_key(self, user_index: int = 0) -> int | None:
         """
@@ -63,9 +65,11 @@ class FaceData:
             main loop for face recognition daemon
         """
         logging.debug('face recognition daemon started')
+        print(1)
         while True:
             if settings.MOTION_DETECTED:
-                self.recognize(settings.LAST_FRAME)
+                if time.time() - self.last_recognize_time > settings.CAMERA_RECOGNITION_INTERVAL:
+                    self.recognize(settings.LAST_FRAME)
 
     def recognize(self, captured_image: string = ""):
         """
@@ -88,3 +92,6 @@ class FaceData:
                     index_key = index_key + 1
 
         settings.MATCHED_USERS = matched_users
+        print("IMG RECOGNIZE FPS: ", 1.0 / (time.time() - self.last_recognize_time))
+        self.last_recognize_time = time.time()
+

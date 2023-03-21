@@ -11,6 +11,7 @@ from tkinter import ttk
 
 from PIL import ImageTk, Image
 
+import camera
 import settings
 from mirror import Mirror
 from news import NewsMethods
@@ -211,6 +212,7 @@ class WeatherNode:
 class FaceNode:
     def __init__(self, root):
         from collections import deque
+        self.last_detected = time.time()
         face_node = tk.Frame(root, height=30, width=100, bg='red')
         face_node.pack(side=LEFT)
         self.webcam_image_node = tk.Label(root, font=('Tahoma', 15), bg='black', fg='white')
@@ -259,12 +261,21 @@ class FaceNode:
                 user = session.query(User).filter(User.id == face_id).first()
                 greetings = f'{greetings}, {user.name}, have a good day'
             self.face_detected_node.config(text=f'hello {greetings}')
+            self.last_detected = time.time()
         else:
             self.face_detected_node.config(text='no face')
         self.face_detected_node.after(10, func=lambda: self.face_detected())
 
 
 if __name__ == '__main__':
+    c_d = threading.Thread(name='camera_daemon', target=CameraData().start)
+    c_d.setDaemon(True)
+    c_d.start()
+    m_d = threading.Thread(name='motion_daemon', target=MotionData().detect_motion)
+    m_d.setDaemon(True)
+    m_d.start()
+    FaceData().start()
+    exit()
 
     ss = SplashScreen()
     # load daemons
@@ -279,16 +290,16 @@ if __name__ == '__main__':
     time.sleep(0.2)
     ss.increase(20)
 
-    thread = threading.Thread(name='news_daemon', target=NewsMethods().start)
-    thread.setDaemon(True)
-    thread.start()
-    ss.increase(20)
-
-    thread = threading.Thread(name='weather_daemon', target=WeatherMethods().start)
-    thread.setDaemon(True)
-    thread.start()
-    time.sleep(0.2)
-    ss.increase(20)
+    # thread = threading.Thread(name='news_daemon', target=NewsMethods().start)
+    # thread.setDaemon(True)
+    # thread.start()
+    # ss.increase(20)
+    #
+    # thread = threading.Thread(name='weather_daemon', target=WeatherMethods().start)
+    # thread.setDaemon(True)
+    # thread.start()
+    # time.sleep(0.2)
+    # ss.increase(20)
 
     c_d = threading.Thread(name='camera_daemon', target=CameraData().start)
     c_d.setDaemon(True)
@@ -302,21 +313,21 @@ if __name__ == '__main__':
     time.sleep(0.2)
     ss.increase(20)
 
-    audio_recorded = threading.Event()
-    ar_d = threading.Thread(name='audio_recording_daemon',
-                            target=AudioRecorder(audio_recorded).start)
-    ar_d.setDaemon(True)
-    ar_d.start()
-    vr_d = threading.Thread(name='voice_recognition_daemon', target=VoiceData(audio_recorded).start)
-    vr_d.setDaemon(True)
-    vr_d.start()
-    time.sleep(0.2)
-    ss.increase(20)
+    # audio_recorded = threading.Event()
+    # ar_d = threading.Thread(name='audio_recording_daemon',
+    #                         target=AudioRecorder(audio_recorded).start)
+    # ar_d.setDaemon(True)
+    # ar_d.start()
+    # vr_d = threading.Thread(name='voice_recognition_daemon', target=VoiceData(audio_recorded).start)
+    # vr_d.setDaemon(True)
+    # vr_d.start()
+    # time.sleep(0.2)
+    # ss.increase(20)
     ss.end()
 
     root_node = tk.Tk()
     root_node.bind('<Escape>', leave)
-    root_node.attributes("-fullscreen", True)
+    root_node.attributes("-fullscreen", False)
     root_node.configure(background='black')
 
     top_row = tk.Frame(root_node, bg='black')
