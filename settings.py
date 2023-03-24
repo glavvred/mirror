@@ -27,10 +27,12 @@ YANDEX_GEOCODER_API_KEY = 'b7221eed-1eca-44f8-b906-1b7ee8b7dd55'
 CAMERA_ID_MAX = 10
 CAMERA_INTERVAL = 0.01  # ~ 100fps at pc webcam
 CAMERA_DETECTION_INTERVAL = 0.008  # ~ 100fps at pc webcam
+CAMERA_DETECTION_FADE_OUT = 3  # ~ 100fps at pc webcam
 CAMERA_RECOGNITION_INTERVAL = 0.008  # ~ 100fps at pc webcam
+FADE_OUT_TIME = 5
 LAST_FRAME = None
 MOTION_DETECTED = None
-MATCHED_USERS = None
+MATCHED_USERS = []
 
 LOGGING_TO_STDOUT = False  # вывод sql запросов в консоль
 

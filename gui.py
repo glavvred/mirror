@@ -13,7 +13,6 @@ from PIL import ImageTk, Image
 
 import camera
 import settings
-from mirror import Mirror
 from news import NewsMethods
 from settings import NEWS_COUNT
 from weather import WeatherMethods
@@ -268,19 +267,9 @@ class FaceNode:
 
 
 if __name__ == '__main__':
-    c_d = threading.Thread(name='camera_daemon', target=CameraData().start)
-    c_d.setDaemon(True)
-    c_d.start()
-    m_d = threading.Thread(name='motion_daemon', target=MotionData().detect_motion)
-    m_d.setDaemon(True)
-    m_d.start()
-    FaceData().start()
-    exit()
-
     ss = SplashScreen()
     # load daemons
     faulthandler.enable()
-    mirror = ToolBox().start_mirror()
     logger = ToolBox().get_logger("main", logging.DEBUG)
 
     session = DbConnect.get_session()
@@ -342,10 +331,10 @@ if __name__ == '__main__':
 
     NewsNode(mid_row)
     face = FaceNode(mid_row)
-    face_t = threading.Thread(name='webcam_image', target=face.show_webcam())
-    face_t.start()
-    # face_t2 = threading.Thread(name='webcam_image2', target=face.movement_detected())
-    # face_t2.start()
+    # face_t = threading.Thread(name='webcam_image', target=face.show_webcam())
+    # face_t.start()
+    face_t2 = threading.Thread(name='webcam_image2', target=face.movement_detected())
+    face_t2.start()
     face_t3 = threading.Thread(name='webcam_image3', target=face.face_detected())
     face_t3.start()
 

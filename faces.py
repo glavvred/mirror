@@ -1,9 +1,11 @@
 """ Face finder """
 from __future__ import annotations
 
+import array
 import string
 import time
 from os import path, getcwd
+from pprint import pprint
 
 # https://github.com/ageitgey/face_recognition
 import face_recognition  # pylint: disable=E0401
@@ -29,6 +31,7 @@ class FaceData:
         self.known_encoding_faces = []
         self.face_user_keys = {}
         self.face_user_names = {}
+        self.fading_users = {}
         # init load
         self.load_known()
         self.last_recognize_time = time.time()
@@ -65,8 +68,8 @@ class FaceData:
             main loop for face recognition daemon
         """
         logging.debug('face recognition daemon started')
-        print(1)
         while True:
+            self.fade_out()
             if settings.MOTION_DETECTED:
                 if time.time() - self.last_recognize_time > settings.CAMERA_RECOGNITION_INTERVAL:
                     self.recognize(settings.LAST_FRAME)
@@ -79,8 +82,11 @@ class FaceData:
         """
         matched_users = []
 
+        start_time = time.time()
         unknown_face_image_locations = face_recognition.face_locations(captured_image)
+        # print("--- %s seconds --- 1 " % (time.time() - start_time))
         unknown_face_image_encodings = face_recognition.face_encodings(captured_image, unknown_face_image_locations)
+        # print("--- %s seconds --- 2 " % (time.time() - start_time))
         if len(unknown_face_image_encodings) > 0:
             for unknown_face_image_encoding in unknown_face_image_encodings:
                 results = face_recognition.compare_faces(
@@ -88,10 +94,25 @@ class FaceData:
                 index_key = 0
                 for matched in results:
                     if matched:
-                        matched_users.append(self.get_user_by_key(index_key))
+                        user_id = self.get_user_by_key(index_key)
+                        matched_users.append(user_id)
                     index_key = index_key + 1
 
-        settings.MATCHED_USERS = matched_users
-        print("IMG RECOGNIZE FPS: ", 1.0 / (time.time() - self.last_recognize_time))
+        for user_id in matched_users:
+            print(user_id)
+            self.fade_in(user_id)
+        # print("IMG RECOGNIZE FPS: ", 1.0 / (time.time() - self.last_recognize_time))
         self.last_recognize_time = time.time()
 
+    def fade_in(self, user_id):
+        self.fading_users[user_id] = time.time()
+        if user_id not in settings.MATCHED_USERS:
+            settings.MATCHED_USERS.append(user_id)
+        print('added')
+
+    def fade_out(self):
+        for user_id in list(self.fading_users):
+            if time.time() > self.fading_users[user_id] + settings.FADE_OUT_TIME:
+                self.fading_users.pop(user_id, None)
+                settings.MATCHED_USERS.remove(user_id)
+                print('removed')

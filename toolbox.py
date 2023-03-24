@@ -6,7 +6,6 @@ import sys
 from flask import Response
 
 import settings
-from mirror import Mirror
 
 
 class ApiResponseHandle:
@@ -31,13 +30,6 @@ class ToolBox:
     """
     tools
     """
-
-    def __init__(self):
-        self.mirror = None
-
-    @staticmethod
-    def start_mirror():
-        return Mirror('main')
 
     @staticmethod
     def get_logger(channel, level=logging.DEBUG):

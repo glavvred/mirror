@@ -11,7 +11,6 @@ from toolbox import ToolBox
 
 session = DbConnect.get_session()
 logger = ToolBox.get_logger('motion')
-mirror = ToolBox.start_mirror()
 
 
 class MotionData:
@@ -61,8 +60,11 @@ class MotionData:
                                                 cv2.CHAIN_APPROX_SIMPLE)
                     contours = imutils.grab_contours(contours)
                     for contour in contours:
+                        print(cv2.contourArea(contour))
                         if cv2.contourArea(contour) > 500:
                             settings.MOTION_DETECTED = True
+                            self.last_detect = time.time() + settings.CAMERA_DETECTION_FADE_OUT
+                            # не гасим флаг движения чтобы не моргал
 
                     # print("MOTION DETECTION FPS: ", 1.0 / (time.time() - self.last_detect))
                     self.last_detect = time.time()
